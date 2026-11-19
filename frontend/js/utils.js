@@ -1,39 +1,10 @@
 /**
  * Shared utility helpers.
+ *
+ * Auth session helpers are sourced from ./auth.js and re-exported here
+ * to maintain backward compatibility across existing imports.
  */
-
-/**
- * Returns the stored JWT token, or null if absent.
- * @returns {string|null}
- */
-export function getToken() {
-  return sessionStorage.getItem('ce_token');
-}
-
-/**
- * Returns the stored user object, or null if absent.
- * @returns {Object|null}
- */
-export function getUser() {
-  const raw = sessionStorage.getItem('ce_user');
-  try { return raw ? JSON.parse(raw) : null; } catch { return null; }
-}
-
-/**
- * Returns true when a valid session token exists.
- * @returns {boolean}
- */
-export function isAuthenticated() {
-  return Boolean(getToken());
-}
-
-/**
- * Returns true when the stored user has the 'admin' role.
- * @returns {boolean}
- */
-export function isAdmin() {
-  return getUser()?.role === 'admin';
-}
+export { getToken, getUser, isAuthenticated, isAdmin } from './auth.js';
 
 /**
  * Formats an ISO date string to a locale-friendly display value.
@@ -61,7 +32,7 @@ export function formatDateTime(isoString) {
 }
 
 /**
- * Escapes HTML special characters to prevent injection.
+ * Escapes HTML special characters to prevent XSS injection.
  * @param {string} str
  * @returns {string}
  */
@@ -103,3 +74,23 @@ export function timeAgo(isoString) {
   return `${days}d ago`;
 }
 
+/**
+ * Displays a lightweight toast notification on the page.
+ * @param {string} message - Notification text
+ * @param {'info'|'success'|'error'} [type='info'] - Severity variant
+ * @param {number} [durationMs=4000] - Display duration before auto-removal
+ */
+export function showToast(message, type = 'info', durationMs = 4000) {
+  const toast = document.createElement('div');
+  const typeClass = type === 'success' ? 'toast-success' : type === 'error' ? 'toast-error' : 'toast-info';
+  toast.className = `${typeClass} transition-opacity duration-300`;
+  toast.setAttribute('role', 'alert');
+  toast.textContent = message;
+
+  document.body.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    setTimeout(() => toast.remove(), 300);
+  }, durationMs);
+}

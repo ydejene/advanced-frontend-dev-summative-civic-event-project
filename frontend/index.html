@@ -307,28 +307,32 @@
 
         <!-- Promotions placeholder card -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div class="card flex flex-col">
+          <div class="card flex flex-col" id="featured-promo-card">
             <div class="relative h-44 bg-deep-teal flex items-center justify-center rounded-t-lg overflow-hidden">
               <svg class="w-16 h-16 text-teal/50" xmlns="http://www.w3.org/2000/svg"
                    fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round"
                       d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z"/>
               </svg>
-              <div class="absolute inset-0 flex items-center justify-center">
-                <span class="text-soft-mint/60 text-sm font-medium">Video promotions available after login</span>
+              <div class="absolute inset-0 flex items-center justify-center" id="promo-media-badge">
+                <span class="text-soft-mint/80 text-sm font-medium">Video promotions & community highlights</span>
               </div>
             </div>
             <div class="p-5 flex-1 flex flex-col">
               <h3 class="font-heading font-semibold text-deep-teal text-base mb-2">Community Video Promotions</h3>
-              <p class="text-sm text-gray-600 flex-1 mb-4">
-                Watch community promotions and event highlights. Log in to view the full promotion library.
+              <p class="text-sm text-gray-600 flex-1 mb-4" id="promo-card-desc">
+                Watch community promotions, cultural spotlights, and event highlights from across our city.
               </p>
-              <a href="/pages/auth/login.html" class="btn-secondary text-sm">Log in to watch</a>
+              <div id="promo-cta-container">
+                <a href="/pages/promotions/index.html" class="btn-primary text-sm inline-flex items-center gap-2" id="promo-cta-btn">
+                  Watch promotions
+                </a>
+              </div>
             </div>
           </div>
 
           <!-- Community CTA card -->
-          <div class="card bg-soft-mint/30 p-6 flex flex-col justify-center border-dashed border-2 border-teal/20">
+          <div class="card bg-soft-mint/30 p-6 flex flex-col justify-center border-dashed border-2 border-teal/20" id="community-cta-card">
             <div class="w-12 h-12 bg-teal/10 rounded-lg flex items-center justify-center mb-4">
               <svg class="w-6 h-6 text-teal" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                    stroke-width="1.5" stroke="currentColor" aria-hidden="true">
@@ -336,11 +340,13 @@
                       d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z"/>
               </svg>
             </div>
-            <h3 class="font-heading font-semibold text-deep-teal text-base mb-2">Join the Community</h3>
-            <p class="text-sm text-gray-600 mb-4 leading-relaxed">
+            <h3 class="font-heading font-semibold text-deep-teal text-base mb-2" id="community-cta-title">Join the Community</h3>
+            <p class="text-sm text-gray-600 mb-4 leading-relaxed" id="community-cta-desc">
               Create an account to register for events, receive civic announcements and stay connected with your neighbourhood.
             </p>
-            <a href="/pages/auth/signup.html" class="btn-primary text-sm">Create a free account</a>
+            <div id="community-cta-action">
+              <a href="/pages/auth/signup.html" class="btn-primary text-sm" id="community-cta-btn">Create a free account</a>
+            </div>
           </div>
         </div>
 

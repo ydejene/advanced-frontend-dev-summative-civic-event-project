@@ -1,16 +1,28 @@
 /**
  * Shared header, footer and navigation initialization.
  * Renders the application shell and reflects current authentication state.
+ * Supports cross-tab synchronization so navigation updates when auth state changes.
  */
-import { isAuthenticated, isAdmin, getUser } from './utils.js';
+import { isAuthenticated, isAdmin, getUser, logout } from './auth.js';
+import { escapeHtml } from './utils.js';
+
+let currentShellPage = '';
 
 /**
- * Generates the public header HTML.
- * Navigation links and auth controls adapt based on session state.
+ * Generates the shared header HTML.
+ * Navigation controls dynamically adapt based on session authentication state and user role.
+ *
+ * Role-based navigation rule:
+ * - Visitors see 'Log in' and 'Sign up' actions.
+ * - Authenticated users see their profile dropdown, notification bell, and account links.
+ * - Administrators additionally receive the 'Admin Dashboard' link in both desktop and mobile menus.
+ * - Normal users never receive admin navigation links.
+ *
  * @param {string} [activePage] - Identifier matching a nav item (home|events|announcements|promotions).
  * @returns {string}
  */
 function headerHTML(activePage = '') {
+  currentShellPage = activePage || currentShellPage;
   const user = getUser();
   const authenticated = isAuthenticated();
   const admin = isAdmin();
@@ -23,8 +35,9 @@ function headerHTML(activePage = '') {
   ];
 
   const navLinks = navItems.map(item => {
-    const active = activePage === item.id;
+    const active = currentShellPage === item.id;
     return `<a href="${item.href}"
+         data-nav-id="${item.id}"
          class="${active ? 'nav-link-active' : 'nav-link'}"
          ${active ? 'aria-current="page"' : ''}>${item.label}</a>`;
   }).join('');
@@ -32,14 +45,14 @@ function headerHTML(activePage = '') {
   /* Auth controls — login/signup for guests; profile dropdown for authenticated users. */
   let authControls;
   if (authenticated) {
-    const displayName = user?.full_name?.split(' ')[0] ?? 'Account';
+    const displayName = escapeHtml(user?.full_name?.split(' ')[0] ?? 'Account');
     const adminLink = admin
-      ? `<a href="/pages/admin/dashboard.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-soft-mint">Admin Dashboard</a>`
+      ? `<a href="/pages/admin/dashboard.html" class="block px-4 py-2 text-sm text-teal font-medium hover:bg-soft-mint" role="menuitem">Admin Dashboard</a>`
       : '';
     authControls = `
       <div class="relative" id="profile-menu">
         <button type="button"
-                class="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-teal focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal"
+                class="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-teal focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal cursor-pointer"
                 aria-haspopup="true" aria-expanded="false" aria-controls="profile-dropdown"
                 id="profile-menu-btn">
           <svg class="w-5 h-5 text-teal" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -48,7 +61,7 @@ function headerHTML(activePage = '') {
                   d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/>
           </svg>
           <span>${displayName}</span>
-          <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+          <svg class="w-4 h-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                stroke-width="2" stroke="currentColor" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
           </svg>
@@ -65,7 +78,7 @@ function headerHTML(activePage = '') {
              class="block px-4 py-2 text-sm text-gray-700 hover:bg-soft-mint" role="menuitem">My Service Requests</a>
           <hr class="my-1 border-gray-100">
           <button type="button" id="logout-btn"
-                  class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50" role="menuitem">
+                  class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 cursor-pointer" role="menuitem">
             Logout
           </button>
         </div>
@@ -130,7 +143,7 @@ function headerHTML(activePage = '') {
 
       <!-- Mobile menu toggle -->
       <button type="button"
-              class="md:hidden p-2 rounded-md text-gray-600 hover:bg-soft-mint focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal"
+              class="md:hidden p-2 rounded-md text-gray-600 hover:bg-soft-mint focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal cursor-pointer"
               aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobile-menu"
               id="mobile-menu-btn">
         <svg class="w-6 h-6" id="mobile-menu-icon-open" xmlns="http://www.w3.org/2000/svg"
@@ -151,8 +164,9 @@ function headerHTML(activePage = '') {
     <nav class="container-content py-3 flex flex-col gap-1">
       ${navItems.map(item => `
         <a href="${item.href}"
-           class="block px-3 py-2.5 rounded-md text-sm font-medium ${activePage === item.id ? 'text-teal bg-soft-mint' : 'text-gray-700 hover:bg-soft-mint hover:text-teal'}"
-           ${activePage === item.id ? 'aria-current="page"' : ''}>${item.label}</a>`).join('')}
+           data-nav-id="${item.id}"
+           class="block px-3 py-2.5 rounded-md text-sm font-medium ${currentShellPage === item.id ? 'text-teal bg-soft-mint' : 'text-gray-700 hover:bg-soft-mint hover:text-teal'}"
+           ${currentShellPage === item.id ? 'aria-current="page"' : ''}>${item.label}</a>`).join('')}
       <hr class="my-2 border-gray-100">
       ${authenticated ? `
         <a href="/pages/user/profile.html"
@@ -162,9 +176,9 @@ function headerHTML(activePage = '') {
         <a href="/pages/notifications/index.html"
            class="block px-3 py-2.5 rounded-md text-sm font-medium text-gray-700 hover:bg-soft-mint">Notifications</a>
         ${admin ? `<a href="/pages/admin/dashboard.html"
-                      class="block px-3 py-2.5 rounded-md text-sm font-medium text-gray-700 hover:bg-soft-mint">Admin Dashboard</a>` : ''}
+                      class="block px-3 py-2.5 rounded-md text-sm font-medium text-teal font-semibold hover:bg-soft-mint">Admin Dashboard</a>` : ''}
         <button type="button" id="mobile-logout-btn"
-                class="block w-full text-left px-3 py-2.5 rounded-md text-sm font-medium text-red-600 hover:bg-red-50">Logout</button>
+                class="block w-full text-left px-3 py-2.5 rounded-md text-sm font-medium text-red-600 hover:bg-red-50 cursor-pointer">Logout</button>
       ` : `
         <a href="/pages/auth/login.html"
            class="block px-3 py-2.5 rounded-md text-sm font-medium text-teal hover:bg-soft-mint">Log in</a>
@@ -244,10 +258,11 @@ function footerHTML() {
  * @param {string} [activePage] - Active nav identifier passed through from each page.
  */
 export function initShell(activePage = '') {
+  if (activePage) currentShellPage = activePage;
   const headerEl = document.getElementById('site-header');
   const footerEl = document.getElementById('site-footer');
 
-  if (headerEl) headerEl.innerHTML = headerHTML(activePage);
+  if (headerEl) headerEl.innerHTML = headerHTML(currentShellPage);
   if (footerEl) footerEl.innerHTML = footerHTML();
 
   attachHeaderHandlers();
@@ -303,13 +318,24 @@ function attachHeaderHandlers() {
     });
   }
 
-  /* Logout handlers (desktop and mobile) */
+  /* Logout handlers (desktop and mobile) — clears session and redirects */
   ['logout-btn', 'mobile-logout-btn'].forEach(id => {
     document.getElementById(id)?.addEventListener('click', () => {
-      sessionStorage.removeItem('ce_token');
-      sessionStorage.removeItem('ce_user');
-      window.location.href = '/index.html';
+      logout('/pages/auth/login.html');
     });
   });
 }
 
+/*
+ * Cross-tab navigation synchronization:
+ * When login or logout occurs in another tab, re-render the header immediately.
+ */
+if (typeof window !== 'undefined') {
+  window.addEventListener('auth-state-changed', () => {
+    const headerEl = document.getElementById('site-header');
+    if (headerEl) {
+      headerEl.innerHTML = headerHTML(currentShellPage);
+      attachHeaderHandlers();
+    }
+  });
+}
