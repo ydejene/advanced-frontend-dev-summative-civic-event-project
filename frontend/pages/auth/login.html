@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Log in to your CivicEvents account to register for events and stay connected.">
+  <title>Log In — CivicEvents</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/output.css">
+  <link rel="icon" type="image/svg+xml" href="/assets/icons/civicevents-mark.svg">
+</head>
+<body class="font-body bg-off-white flex flex-col min-h-screen">
+
+  <div id="site-header"></div>
+
+  <main class="flex-1 flex items-center justify-center py-12 px-4" id="main-content">
+    <div class="w-full max-w-sm">
+
+      <!-- Logo mark -->
+      <div class="text-center mb-8">
+        <a href="/index.html" class="inline-block">
+          <img src="/assets/icons/civicevents-mark.svg"
+               alt="CivicEvents"
+               class="h-12 w-auto mx-auto mb-3">
+        </a>
+        <h1 class="font-heading text-2xl font-bold text-deep-teal">Welcome back</h1>
+        <p class="mt-1 text-sm text-gray-500">Log in to your CivicEvents account</p>
+      </div>
+
+      <!-- Login form — wired to API in Stage 2 -->
+      <div class="card p-6">
+        <form id="login-form" novalidate aria-label="Login form">
+
+          <div class="mb-4">
+            <label for="email" class="form-label">Email address</label>
+            <input type="email" id="email" name="email" autocomplete="email"
+                   class="form-input" placeholder="you@example.com" required>
+            <p class="form-error hidden" id="email-error" role="alert"></p>
+          </div>
+
+          <div class="mb-6">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" id="password" name="password" autocomplete="current-password"
+                   class="form-input" placeholder="••••••••" required>
+            <p class="form-error hidden" id="password-error" role="alert"></p>
+          </div>
+
+          <div id="form-error" class="mb-4 p-3 rounded-md bg-red-50 border border-red-200 text-sm text-red-700 hidden" role="alert"></div>
+
+          <button type="submit" class="btn-primary w-full justify-center py-3" id="login-btn">
+            Log in
+          </button>
+
+        </form>
+      </div>
+
+      <p class="mt-5 text-center text-sm text-gray-500">
+        Don't have an account?
+        <a href="/pages/auth/signup.html" class="text-teal font-medium hover:text-deep-teal">Sign up</a>
+      </p>
+
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="/node_modules/jquery/dist/jquery.min.js"></script>
+  <script type="module" src="/js/pages/login.js"></script>
+
+</body>
+</html>
+
