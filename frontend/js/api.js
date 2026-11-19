@@ -1,11 +1,11 @@
 /**
  * Centralized jQuery AJAX client.
  *
- * Automatically attaches a Bearer token to protected requests when a session
- * token is present. Callers receive a jQuery Deferred/Promise.
+ * Automatically attaches Bearer authorization headers to protected requests.
+ * Listens for 401 responses on protected requests to clear invalid or expired sessions.
  */
 import Config from './config.js';
-import { getToken } from './utils.js';
+import { getToken, clearSession } from './auth.js';
 
 /**
  * Core request function.
@@ -13,7 +13,7 @@ import { getToken } from './utils.js';
  * @param {string}  options.method       - HTTP method (GET, POST, PUT, PATCH, DELETE).
  * @param {string}  options.endpoint     - Path relative to API_URL (e.g. '/events').
  * @param {*}       [options.data]       - Request payload (plain object or FormData).
- * @param {boolean} [options.auth=true]  - Whether to attach the Bearer token.
+ * @param {boolean} [options.auth=true]  - Whether to attach Bearer token.
  * @returns {jQuery.Deferred}
  */
 function request({ method, endpoint, data = null, auth = true }) {
@@ -43,7 +43,22 @@ function request({ method, endpoint, data = null, auth = true }) {
     }
   }
 
-  return $.ajax(ajaxConfig);
+  const deferred = $.ajax(ajaxConfig);
+
+  /*
+   * Session expiry handling:
+   * When a protected request receives a 401 Unauthorized response from the API,
+   * it indicates that the stored token has expired or is invalid.
+   * Clear the invalid session and dispatch a session-expired event.
+   */
+  deferred.fail((xhr) => {
+    if (auth && xhr.status === 401) {
+      clearSession();
+      window.dispatchEvent(new CustomEvent('session-expired'));
+    }
+  });
+
+  return deferred;
 }
 
 /** Convenience wrappers matching HTTP verbs. */
@@ -59,9 +74,9 @@ const api = {
 
   /** Public requests that do not attach a token. */
   public: {
+    get:  (endpoint)       => request({ method: 'GET',  endpoint, auth: false }),
     post: (endpoint, data) => request({ method: 'POST', endpoint, data, auth: false }),
   },
 };
 
 export default api;
-
