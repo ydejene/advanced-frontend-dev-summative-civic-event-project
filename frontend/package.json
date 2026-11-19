@@ -1,0 +1,17 @@
+{
+  "name": "civicevents-frontend",
+  "version": "1.0.0",
+  "description": "CivicEvents — Accessible City Events & Services Portal frontend",
+  "private": true,
+  "scripts": {
+    "build": "tailwindcss -i ./css/input.css -o ./css/output.css --minify",
+    "watch": "tailwindcss -i ./css/input.css -o ./css/output.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.17"
+  },
+  "dependencies": {
+    "jquery": "^3.7.1"
+  }
+}
+

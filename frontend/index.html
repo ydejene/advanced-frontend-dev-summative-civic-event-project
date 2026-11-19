@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="CivicEvents — Discover and register for local community events, announcements and civic promotions.">
+  <title>CivicEvents — Your Community Portal</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Compiled Tailwind CSS -->
+  <link rel="stylesheet" href="/css/output.css">
+
+  <!-- Favicon (using the SVG mark) -->
+  <link rel="icon" type="image/svg+xml" href="/assets/icons/civicevents-mark.svg">
+</head>
+<body class="font-body bg-off-white flex flex-col min-h-screen">
+
+  <!-- Application shell: header injected by components.js -->
+  <div id="site-header"></div>
+
+  <main id="main-content">
+
+    <!-- ============================================================
+         Hero section
+         ============================================================ -->
+    <section class="relative overflow-hidden bg-deep-teal" aria-labelledby="hero-heading">
+
+      <!-- Background image -->
+      <div class="absolute inset-0">
+        <img src="/assets/images/hero-community.jpg"
+             alt=""
+             role="presentation"
+             class="w-full h-full object-cover object-center opacity-30">
+        <div class="absolute inset-0 bg-gradient-to-b from-deep-teal/60 via-deep-teal/40 to-deep-teal/80"></div>
+      </div>
+
+      <!-- Hero content -->
+      <div class="relative container-content py-20 sm:py-28 lg:py-36">
+        <div class="max-w-2xl">
+          <h1 id="hero-heading"
+              class="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight">
+            Your City.<br>
+            <span class="text-soft-mint">Your Community.</span>
+          </h1>
+          <p class="mt-4 text-lg text-gray-300 leading-relaxed max-w-lg">
+            Discover local events, stay informed with civic announcements and
+            get involved in your neighbourhood.
+          </p>
+
+          <!-- Hero search -->
+          <form id="hero-search-form"
+                class="mt-8 flex flex-col sm:flex-row gap-3 max-w-xl"
+                role="search" aria-label="Search events">
+            <label for="hero-search-input" class="sr-only">Search events</label>
+            <input type="search"
+                   id="hero-search-input"
+                   name="search"
+                   placeholder="Search events by name or location…"
+                   class="flex-1 rounded-md border-0 bg-white/95 px-4 py-3 text-sm text-gray-900
+                          placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-warm-amber shadow-sm">
+            <button type="submit" class="btn-primary py-3 px-6 shadow-sm whitespace-nowrap">
+              <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                   stroke-width="2" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/>
+              </svg>
+              Search Events
+            </button>
+          </form>
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- ============================================================
+         Category filter shortcuts
+         ============================================================ -->
+    <section class="bg-white border-b border-gray-200" aria-label="Browse by category">
+      <div class="container-content py-5">
+        <div class="flex flex-wrap gap-2 items-center">
+          <span class="text-xs font-medium text-gray-500 mr-1">Browse:</span>
+          <a href="/pages/events/index.html?category=community"
+             class="badge-teal hover:bg-teal hover:text-white transition-colors px-3 py-1 text-xs cursor-pointer">
+            Community
+          </a>
+          <a href="/pages/events/index.html?category=cultural"
+             class="badge-teal hover:bg-teal hover:text-white transition-colors px-3 py-1 text-xs cursor-pointer">
+            Cultural
+          </a>
+          <a href="/pages/events/index.html?category=workshop"
+             class="badge-teal hover:bg-teal hover:text-white transition-colors px-3 py-1 text-xs cursor-pointer">
+            Workshops
+          </a>
+          <a href="/pages/events/index.html?category=sports"
+             class="badge-teal hover:bg-teal hover:text-white transition-colors px-3 py-1 text-xs cursor-pointer">
+            Sports
+          </a>
+          <a href="/pages/events/index.html?category=environment"
+             class="badge-teal hover:bg-teal hover:text-white transition-colors px-3 py-1 text-xs cursor-pointer">
+            Environment
+          </a>
+          <a href="/pages/events/index.html?category=volunteering"
+             class="badge-teal hover:bg-teal hover:text-white transition-colors px-3 py-1 text-xs cursor-pointer">
+            Volunteering
+          </a>
+          <a href="/pages/events/index.html"
+             class="text-xs text-teal hover:text-deep-teal font-medium ml-2">
+            All events →
+          </a>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================
+         Upcoming events section
+         The event cards below use approved fallback imagery only.
+         Real event data is loaded from the backend in Stage 3.
+         ============================================================ -->
+    <section class="section" aria-labelledby="events-heading">
+      <div class="container-content">
+
+        <div class="flex items-center justify-between mb-8">
+          <div>
+            <h2 id="events-heading" class="text-2xl sm:text-3xl font-heading font-bold text-deep-teal">
+              Upcoming Events
+            </h2>
+            <p class="mt-1 text-sm text-gray-500">Events are loaded from the community calendar.</p>
+          </div>
+          <a href="/pages/events/index.html"
+             class="btn-secondary text-sm hidden sm:inline-flex">
+            View all events
+          </a>
+        </div>
+
+        <!-- Events grid — placeholder cards using approved local imagery -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="events-grid">
+
+          <!-- Placeholder card 1 -->
+          <article class="card group" aria-label="Community Clean-up Day placeholder">
+            <div class="relative h-48 overflow-hidden">
+              <img src="/assets/images/event-environment.png"
+                   alt="Volunteers cleaning up a community park"
+                   class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
+              <span class="absolute top-3 left-3 badge-teal text-xs">Environment</span>
+            </div>
+            <div class="p-5">
+              <h3 class="font-heading font-semibold text-deep-teal text-base leading-snug mb-1">
+                Community Clean-up Day
+              </h3>
+              <p class="text-xs text-gray-500 flex items-center gap-1 mb-3">
+                <svg class="w-3.5 h-3.5 flex-shrink-0" xmlns="http://www.w3.org/2000/svg"
+                     fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/>
+                </svg>
+                Sign in to view event details
+              </p>
+              <a href="/pages/auth/login.html"
+                 class="btn-secondary text-xs w-full justify-center">
+                Log in to register
+              </a>
+            </div>
+          </article>
+
+          <!-- Placeholder card 2 -->
+          <article class="card group" aria-label="Cultural Festival placeholder">
+            <div class="relative h-48 overflow-hidden">
+              <img src="/assets/images/event-cultural-festival.jpg"
+                   alt="Performers at a multicultural street festival"
+                   class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
+              <span class="absolute top-3 left-3 badge-teal text-xs">Cultural</span>
+            </div>
+            <div class="p-5">
+              <h3 class="font-heading font-semibold text-deep-teal text-base leading-snug mb-1">
+                Annual Cultural Festival
+              </h3>
+              <p class="text-xs text-gray-500 flex items-center gap-1 mb-3">
+                <svg class="w-3.5 h-3.5 flex-shrink-0" xmlns="http://www.w3.org/2000/svg"
+                     fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/>
+                </svg>
+                Sign in to view event details
+              </p>
+              <a href="/pages/auth/login.html"
+                 class="btn-secondary text-xs w-full justify-center">
+                Log in to register
+              </a>
+            </div>
+          </article>
+
+          <!-- Placeholder card 3 -->
+          <article class="card group" aria-label="Community Workshop placeholder">
+            <div class="relative h-48 overflow-hidden">
+              <img src="/assets/images/event-workshop.jpg"
+                   alt="Participants collaborating at a community workshop"
+                   class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
+              <span class="absolute top-3 left-3 badge-teal text-xs">Workshop</span>
+            </div>
+            <div class="p-5">
+              <h3 class="font-heading font-semibold text-deep-teal text-base leading-snug mb-1">
+                Skills Development Workshop
+              </h3>
+              <p class="text-xs text-gray-500 flex items-center gap-1 mb-3">
+                <svg class="w-3.5 h-3.5 flex-shrink-0" xmlns="http://www.w3.org/2000/svg"
+                     fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/>
+                </svg>
+                Sign in to view event details
+              </p>
+              <a href="/pages/auth/login.html"
+                 class="btn-secondary text-xs w-full justify-center">
+                Log in to register
+              </a>
+            </div>
+          </article>
+
+        </div>
+
+        <div class="mt-8 text-center sm:hidden">
+          <a href="/pages/events/index.html" class="btn-secondary text-sm">View all events</a>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- ============================================================
+         Announcements section placeholder
+         Real content is loaded from the backend in Stage 5.
+         ============================================================ -->
+    <section class="section bg-soft-mint/40" aria-labelledby="announcements-heading">
+      <div class="container-content">
+        <div class="flex items-center justify-between mb-8">
+          <div>
+            <h2 id="announcements-heading" class="text-2xl sm:text-3xl font-heading font-bold text-deep-teal">
+              Latest Announcements
+            </h2>
+            <p class="mt-1 text-sm text-gray-500">Stay informed with civic news and updates.</p>
+          </div>
+          <a href="/pages/announcements/index.html"
+             class="btn-secondary text-sm hidden sm:inline-flex">
+            All announcements
+          </a>
+        </div>
+
+        <!-- Illustration placeholder for announcements section -->
+        <div class="relative rounded-xl overflow-hidden bg-white border border-gray-200 shadow-sm">
+          <div class="flex flex-col sm:flex-row">
+            <div class="sm:w-56 h-44 sm:h-auto flex-shrink-0 overflow-hidden">
+              <img src="/assets/images/announcement-awareness.jpg"
+                   alt=""
+                   role="presentation"
+                   class="w-full h-full object-cover">
+            </div>
+            <div class="flex-1 p-6 flex flex-col justify-center">
+              <div class="flex items-center gap-2 mb-3">
+                <svg class="w-5 h-5 text-teal flex-shrink-0" xmlns="http://www.w3.org/2000/svg"
+                     fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z"/>
+                </svg>
+                <span class="text-xs font-medium text-teal uppercase tracking-wide">Civic Announcements</span>
+              </div>
+              <h3 class="font-heading font-semibold text-deep-teal text-lg mb-2">
+                Audio announcements from your local authority
+              </h3>
+              <p class="text-sm text-gray-600 mb-4">
+                Listen to the latest civic announcements. Log in to access the full announcement archive.
+              </p>
+              <div class="flex gap-3">
+                <a href="/pages/announcements/index.html" class="btn-primary text-sm">Browse Announcements</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- ============================================================
+         Promotions section placeholder
+         Real content is loaded from the backend in Stage 5.
+         ============================================================ -->
+    <section class="section" aria-labelledby="promotions-heading">
+      <div class="container-content">
+        <div class="flex items-center justify-between mb-8">
+          <div>
+            <h2 id="promotions-heading" class="text-2xl sm:text-3xl font-heading font-bold text-deep-teal">
+              Featured Promotions
+            </h2>
+            <p class="mt-1 text-sm text-gray-500">Video promotions from the community.</p>
+          </div>
+          <a href="/pages/promotions/index.html"
+             class="btn-secondary text-sm hidden sm:inline-flex">
+            All promotions
+          </a>
+        </div>
+
+        <!-- Promotions placeholder card -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div class="card flex flex-col">
+            <div class="relative h-44 bg-deep-teal flex items-center justify-center rounded-t-lg overflow-hidden">
+              <svg class="w-16 h-16 text-teal/50" xmlns="http://www.w3.org/2000/svg"
+                   fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z"/>
+              </svg>
+              <div class="absolute inset-0 flex items-center justify-center">
+                <span class="text-soft-mint/60 text-sm font-medium">Video promotions available after login</span>
+              </div>
+            </div>
+            <div class="p-5 flex-1 flex flex-col">
+              <h3 class="font-heading font-semibold text-deep-teal text-base mb-2">Community Video Promotions</h3>
+              <p class="text-sm text-gray-600 flex-1 mb-4">
+                Watch community promotions and event highlights. Log in to view the full promotion library.
+              </p>
+              <a href="/pages/auth/login.html" class="btn-secondary text-sm">Log in to watch</a>
+            </div>
+          </div>
+
+          <!-- Community CTA card -->
+          <div class="card bg-soft-mint/30 p-6 flex flex-col justify-center border-dashed border-2 border-teal/20">
+            <div class="w-12 h-12 bg-teal/10 rounded-lg flex items-center justify-center mb-4">
+              <svg class="w-6 h-6 text-teal" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                   stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z"/>
+              </svg>
+            </div>
+            <h3 class="font-heading font-semibold text-deep-teal text-base mb-2">Join the Community</h3>
+            <p class="text-sm text-gray-600 mb-4 leading-relaxed">
+              Create an account to register for events, receive civic announcements and stay connected with your neighbourhood.
+            </p>
+            <a href="/pages/auth/signup.html" class="btn-primary text-sm">Create a free account</a>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- ============================================================
+         Community participation call to action
+         ============================================================ -->
+    <section class="bg-deep-teal" aria-labelledby="cta-heading">
+      <div class="container-content py-16 sm:py-20">
+        <div class="text-center max-w-2xl mx-auto">
+          <h2 id="cta-heading" class="font-heading text-3xl sm:text-4xl font-bold text-white mb-4">
+            Get Involved in Your City
+          </h2>
+          <p class="text-gray-300 text-base sm:text-lg leading-relaxed mb-8">
+            From neighbourhood clean-ups to cultural festivals — there are dozens of ways to
+            contribute and connect with your community.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-3 justify-center">
+            <a href="/pages/events/index.html"
+               class="btn-primary bg-warm-amber text-deep-teal hover:bg-amber-500 focus-visible:outline-warm-amber py-3 px-7">
+              Explore Events
+            </a>
+            <a href="/pages/auth/signup.html"
+               class="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-md border-2 border-soft-mint/40
+                      text-soft-mint font-medium text-sm hover:bg-white/10 transition-colors duration-150">
+              Sign Up Free
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Application shell: footer injected by components.js -->
+  <div id="site-footer"></div>
+
+  <!-- jQuery from node_modules (loaded locally, no CDN) -->
+  <script src="/node_modules/jquery/dist/jquery.min.js"></script>
+
+  <!-- Page module -->
+  <script type="module" src="/js/pages/home.js"></script>
+
+</body>
+</html>
+

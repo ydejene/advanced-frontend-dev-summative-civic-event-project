@@ -1,0 +1,10 @@
+<svg width="164" height="168" viewBox="0 0 164 168" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <title>CivicEvents symbol</title>
+  <desc>A location pin containing a calendar page and amber event marker.</desc>
+  <g id="CivicEvents_Symbol">
+    <path fill="#163B3A" fill-rule="evenodd" d="M82 8C45.55 8 16 37.55 16 74c0 43.27 46.77 75.51 61.9 84.82a7.78 7.78 0 0 0 8.2 0C101.23 149.51 148 117.27 148 74 148 37.55 118.45 8 82 8Zm-27 42a8 8 0 0 0-8 8v43a8 8 0 0 0 8 8h54a8 8 0 0 0 8-8V58a8 8 0 0 0-8-8H55Z"/>
+    <path fill="#247A70" d="M47 68h70v9H47z"/>
+    <path fill="#247A70" d="M64 42a5 5 0 0 1 5 5v11a5 5 0 0 1-10 0V47a5 5 0 0 1 5-5Zm36 0a5 5 0 0 1 5 5v11a5 5 0 0 1-10 0V47a5 5 0 0 1 5-5Z"/>
+    <circle cx="82" cy="92" r="8" fill="#E6A756"/>
+  </g>
+</svg>
