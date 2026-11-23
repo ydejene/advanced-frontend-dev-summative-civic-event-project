@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Stay informed with official municipal bulletins, audio broadcasts, and civic announcements.">
+  <title>City Announcements & Audio Bulletins — CivicEvents</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/output.css">
+  <link rel="icon" type="image/svg+xml" href="/assets/icons/civicevents-mark.svg">
+</head>
+<body class="font-body bg-off-white flex flex-col min-h-screen text-gray-800">
+
+  <!-- Skip link for keyboard accessibility -->
+  <a href="#main-content"
+     class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-teal focus:text-white focus:rounded-md focus:shadow-md">
+    Skip to main content
+  </a>
+
+  <!-- Application shell: header injected by components.js -->
+  <div id="site-header"></div>
+
+  <!-- Breadcrumb navigation -->
+  <div class="bg-white border-b border-gray-200">
+    <div class="container-content py-3">
+      <nav aria-label="Breadcrumb">
+        <ol class="flex items-center space-x-2 text-xs text-gray-500">
+          <li>
+            <a href="/index.html" class="hover:text-teal">Home</a>
+          </li>
+          <li class="flex items-center space-x-2">
+            <span class="text-gray-400">/</span>
+            <span class="text-gray-800 font-medium" aria-current="page">Announcements</span>
+          </li>
+        </ol>
+      </nav>
+    </div>
+  </div>
+
+  <main class="flex-1 pb-16" id="main-content">
+
+    <!-- Page Header Section -->
+    <header class="bg-white border-b border-gray-200 py-8 sm:py-10">
+      <div class="container-content flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div class="max-w-2xl">
+          <span class="badge-teal mb-3 inline-block">Official Bulletins</span>
+          <h1 class="text-3xl sm:text-4xl font-heading font-bold text-deep-teal tracking-tight mb-2">
+            City Announcements
+          </h1>
+          <p class="text-gray-600 text-base sm:text-lg leading-relaxed">
+            Listen to official municipal notices, urgent city updates, and audio broadcasts published by local administration.
+          </p>
+        </div>
+        <div id="admin-actions-container" class="hidden">
+          <a href="/pages/admin/announcements.html" class="btn-primary inline-flex items-center gap-2 text-sm">
+            <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Manage Announcements
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <div class="container-content mt-8">
+
+      <!-- Guest Authentication Required Prompt (Shown when not authenticated) -->
+      <section id="guest-prompt" class="card p-8 sm:p-10 text-center max-w-2xl mx-auto hidden" aria-labelledby="guest-prompt-heading">
+        <div class="w-16 h-16 mx-auto rounded-full bg-soft-mint text-deep-teal flex items-center justify-center mb-4">
+          <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z"/>
+          </svg>
+        </div>
+        <h2 id="guest-prompt-heading" class="text-2xl font-heading font-bold text-deep-teal mb-2">
+          Sign In to Access Announcements
+        </h2>
+        <p class="text-gray-600 text-sm sm:text-base mb-6 leading-relaxed">
+          Official city bulletins and audio recordings are available to registered community members. Sign in or create an account to listen to civic broadcasts.
+        </p>
+        <div class="flex flex-col sm:flex-row justify-center gap-3">
+          <a href="/pages/auth/login.html?redirect=%2Fpages%2Fannouncements%2Findex.html" class="btn-primary px-6 py-2.5">
+            Log In
+          </a>
+          <a href="/pages/auth/signup.html?redirect=%2Fpages%2Fannouncements%2Findex.html" class="btn-secondary px-6 py-2.5">
+            Create an Account
+          </a>
+        </div>
+      </section>
+
+      <!-- Authenticated Content Container -->
+      <div id="authenticated-content" class="hidden">
+
+        <!-- Search and Filter Bar -->
+        <section class="card p-4 sm:p-5 mb-8" aria-label="Announcement filters">
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+            <div class="relative flex-1">
+              <label for="announcement-search" class="sr-only">Search announcements</label>
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+                <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/>
+                </svg>
+              </div>
+              <input type="search"
+                     id="announcement-search"
+                     placeholder="Search announcements by title…"
+                     class="form-input pl-10 pr-9 py-2 text-sm"
+                     autocomplete="off">
+              <button type="button"
+                      id="search-clear-btn"
+                      class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 hidden cursor-pointer"
+                      aria-label="Clear search">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+              </button>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <label for="announcement-sort" class="text-xs font-medium text-gray-600 whitespace-nowrap">Sort by:</label>
+              <select id="announcement-sort" class="form-input py-2 text-xs w-auto">
+                <option value="newest">Newest First</option>
+                <option value="oldest">Oldest First</option>
+                <option value="title">Title (A-Z)</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <!-- Loading Skeleton -->
+        <div id="announcements-loading" class="space-y-4" aria-live="polite" aria-busy="true">
+          <div class="card p-6 animate-pulse space-y-3">
+            <div class="h-4 bg-gray-200 rounded w-1/4"></div>
+            <div class="h-6 bg-gray-200 rounded w-3/4"></div>
+            <div class="h-10 bg-gray-100 rounded"></div>
+          </div>
+          <div class="card p-6 animate-pulse space-y-3">
+            <div class="h-4 bg-gray-200 rounded w-1/5"></div>
+            <div class="h-6 bg-gray-200 rounded w-2/3"></div>
+            <div class="h-10 bg-gray-100 rounded"></div>
+          </div>
+        </div>
+
+        <!-- Error State -->
+        <div id="announcements-error" class="card p-8 text-center max-w-lg mx-auto hidden" role="alert">
+          <div class="w-12 h-12 mx-auto rounded-full bg-red-100 text-red-600 flex items-center justify-center mb-4">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+          </div>
+          <h3 class="font-heading text-lg font-bold text-gray-900 mb-1">Failed to Load Announcements</h3>
+          <p class="text-sm text-gray-600 mb-6" id="error-message">Unable to retrieve announcements right now. Please check your network and try again.</p>
+          <button type="button" id="retry-btn" class="btn-primary text-sm">Try Again</button>
+        </div>
+
+        <!-- Empty State -->
+        <div id="announcements-empty" class="card p-10 text-center max-w-md mx-auto hidden">
+          <div class="w-14 h-14 mx-auto rounded-full bg-soft-mint text-deep-teal flex items-center justify-center mb-4">
+            <svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z"/>
+            </svg>
+          </div>
+          <h3 class="font-heading text-lg font-bold text-deep-teal mb-1" id="empty-title">No Announcements Published</h3>
+          <p class="text-sm text-gray-500 mb-4" id="empty-desc">
+            There are currently no audio announcements available. Please check back later for official city bulletins.
+          </p>
+          <button type="button" id="empty-reset-btn" class="btn-secondary text-xs hidden">Clear Filter</button>
+        </div>
+
+        <!-- Announcements Listing Grid -->
+        <section id="announcements-grid" class="space-y-5 hidden" aria-label="Official announcements list">
+          <!-- Dynamic cards injected by announcements.js -->
+        </section>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Application shell: footer injected by components.js -->
+  <div id="site-footer"></div>
+
+  <!-- Local jQuery -->
+  <script src="/node_modules/jquery/dist/jquery.min.js"></script>
+
+  <!-- Page script module -->
+  <script type="module" src="/js/pages/announcements.js"></script>
+
+</body>
+</html>
+
