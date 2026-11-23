@@ -193,10 +193,31 @@ function headerHTML(activePage = '') {
 
 /**
  * Generates the shared footer HTML.
+ *
+ * Authentication-aware Account section:
+ * - Guests see Log in and Sign up.
+ * - Authenticated users see My Profile and My Registrations.
+ *
+ * The footer re-renders on 'auth-state-changed' so cross-tab login/logout
+ * is reflected immediately without a page reload.
+ *
  * @returns {string}
  */
 function footerHTML() {
   const year = new Date().getFullYear();
+  const authenticated = isAuthenticated();
+
+  /*
+   * Role-based footer account links:
+   * Guests receive authentication entry points.
+   * Authenticated users receive their personal account links.
+   */
+  const accountLinks = authenticated
+    ? `<li><a href="/pages/user/profile.html" class="text-sm text-gray-400 hover:text-soft-mint">My Profile</a></li>
+          <li><a href="/pages/user/registrations.html" class="text-sm text-gray-400 hover:text-soft-mint">My Registrations</a></li>`
+    : `<li><a href="/pages/auth/login.html" class="text-sm text-gray-400 hover:text-soft-mint">Log in</a></li>
+          <li><a href="/pages/auth/signup.html" class="text-sm text-gray-400 hover:text-soft-mint">Sign up</a></li>`;
+
   return `
 <footer class="bg-deep-teal text-gray-300 mt-auto">
   <div class="container-content py-10">
@@ -223,14 +244,11 @@ function footerHTML() {
         </ul>
       </div>
 
-      <!-- Account -->
+      <!-- Account (auth-aware) -->
       <div>
         <h3 class="text-sm font-semibold text-white mb-3 font-heading">Account</h3>
         <ul class="space-y-2">
-          <li><a href="/pages/auth/login.html" class="text-sm text-gray-400 hover:text-soft-mint">Log in</a></li>
-          <li><a href="/pages/auth/signup.html" class="text-sm text-gray-400 hover:text-soft-mint">Sign up</a></li>
-          <li><a href="/pages/user/profile.html" class="text-sm text-gray-400 hover:text-soft-mint">My Profile</a></li>
-          <li><a href="/pages/user/registrations.html" class="text-sm text-gray-400 hover:text-soft-mint">My Registrations</a></li>
+          ${accountLinks}
         </ul>
       </div>
 
@@ -328,7 +346,9 @@ function attachHeaderHandlers() {
 
 /*
  * Cross-tab navigation synchronization:
- * When login or logout occurs in another tab, re-render the header immediately.
+ * When login or logout occurs in another tab, re-render both the header and
+ * the footer so the Account section reflects the updated authentication state
+ * immediately without requiring a manual page refresh.
  */
 if (typeof window !== 'undefined') {
   window.addEventListener('auth-state-changed', () => {
@@ -336,6 +356,11 @@ if (typeof window !== 'undefined') {
     if (headerEl) {
       headerEl.innerHTML = headerHTML(currentShellPage);
       attachHeaderHandlers();
+    }
+
+    const footerEl = document.getElementById('site-footer');
+    if (footerEl) {
+      footerEl.innerHTML = footerHTML();
     }
   });
 }
