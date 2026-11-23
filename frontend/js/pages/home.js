@@ -71,6 +71,18 @@ function updateAuthDependentContent() {
       ctaAction.innerHTML = '<a href="/pages/auth/signup.html" class="btn-primary text-sm inline-flex items-center justify-center">Create a free account</a>';
     }
   }
+
+  // Bottom "Get Involved" CTA secondary button
+  const bottomCtaSec = document.getElementById('bottom-cta-secondary');
+  if (bottomCtaSec) {
+    if (authenticated) {
+      bottomCtaSec.setAttribute('href', '/pages/user/registrations.html');
+      bottomCtaSec.textContent = 'My Registrations';
+    } else {
+      bottomCtaSec.setAttribute('href', '/pages/auth/signup.html');
+      bottomCtaSec.textContent = 'Sign Up Free';
+    }
+  }
 }
 
 /*

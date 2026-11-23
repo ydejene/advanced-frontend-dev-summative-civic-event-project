@@ -118,9 +118,9 @@
 
 
     <!-- ============================================================
-         Upcoming events section
-         The event cards below use approved fallback imagery only.
-         Real event data is loaded from the backend in Stage 3.
+         Community activities showcase section
+         Illustrative preview cards highlighting event categories.
+         Live events are discovered via the events directory.
          ============================================================ -->
     <section class="section" aria-labelledby="events-heading">
       <div class="container-content">
@@ -128,21 +128,23 @@
         <div class="flex items-center justify-between mb-8">
           <div>
             <h2 id="events-heading" class="text-2xl sm:text-3xl font-heading font-bold text-deep-teal">
-              Upcoming Events
+              Explore Community Activities
             </h2>
-            <p class="mt-1 text-sm text-gray-500">Events are loaded from the community calendar.</p>
+            <p class="mt-1 text-sm text-gray-500">Examples of civic gatherings, workshops, and initiatives featured on the platform.</p>
           </div>
           <a href="/pages/events/index.html"
              class="btn-secondary text-sm hidden sm:inline-flex">
-            View all events
+            Browse all events
           </a>
         </div>
 
-        <!-- Events grid — placeholder cards using approved local imagery -->
+        <!-- Events grid — illustrative preview cards using approved local imagery.
+             These are static showcase cards presenting examples of featured categories.
+             All cards link to the events listing page for discovery. -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="events-grid">
 
-          <!-- Placeholder card 1 -->
-          <article class="card group" aria-label="Community Clean-up Day placeholder">
+          <!-- Illustrative card 1 -->
+          <article class="card group" aria-label="Environmental Initiatives preview">
             <div class="relative h-48 overflow-hidden">
               <img src="/assets/images/event-environment.png"
                    alt="Volunteers cleaning up a community park"
@@ -150,26 +152,21 @@
               <span class="absolute top-3 left-3 badge-teal text-xs">Environment</span>
             </div>
             <div class="p-5">
-              <h3 class="font-heading font-semibold text-deep-teal text-base leading-snug mb-1">
-                Community Clean-up Day
+              <h3 class="font-heading font-semibold text-deep-teal text-base leading-snug mb-2">
+                Environmental Initiatives
               </h3>
-              <p class="text-xs text-gray-500 flex items-center gap-1 mb-3">
-                <svg class="w-3.5 h-3.5 flex-shrink-0" xmlns="http://www.w3.org/2000/svg"
-                     fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/>
-                </svg>
-                Sign in to view event details
+              <p class="text-xs text-gray-500 mb-4">
+                Neighbourhood park beautification, community tree planting, and local sustainability projects.
               </p>
-              <a href="/pages/auth/login.html"
+              <a href="/pages/events/index.html"
                  class="btn-secondary text-xs w-full justify-center">
-                Log in to register
+                Browse all events →
               </a>
             </div>
           </article>
 
-          <!-- Placeholder card 2 -->
-          <article class="card group" aria-label="Cultural Festival placeholder">
+          <!-- Illustrative card 2 -->
+          <article class="card group" aria-label="Cultural Celebrations preview">
             <div class="relative h-48 overflow-hidden">
               <img src="/assets/images/event-cultural-festival.jpg"
                    alt="Performers at a multicultural street festival"
@@ -177,26 +174,21 @@
               <span class="absolute top-3 left-3 badge-teal text-xs">Cultural</span>
             </div>
             <div class="p-5">
-              <h3 class="font-heading font-semibold text-deep-teal text-base leading-snug mb-1">
-                Annual Cultural Festival
+              <h3 class="font-heading font-semibold text-deep-teal text-base leading-snug mb-2">
+                Cultural Celebrations
               </h3>
-              <p class="text-xs text-gray-500 flex items-center gap-1 mb-3">
-                <svg class="w-3.5 h-3.5 flex-shrink-0" xmlns="http://www.w3.org/2000/svg"
-                     fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/>
-                </svg>
-                Sign in to view event details
+              <p class="text-xs text-gray-500 mb-4">
+                Multicultural festivals, heritage celebrations, art exhibitions, and community performances.
               </p>
-              <a href="/pages/auth/login.html"
+              <a href="/pages/events/index.html"
                  class="btn-secondary text-xs w-full justify-center">
-                Log in to register
+                Browse all events →
               </a>
             </div>
           </article>
 
-          <!-- Placeholder card 3 -->
-          <article class="card group" aria-label="Community Workshop placeholder">
+          <!-- Illustrative card 3 -->
+          <article class="card group" aria-label="Community Workshops preview">
             <div class="relative h-48 overflow-hidden">
               <img src="/assets/images/event-workshop.jpg"
                    alt="Participants collaborating at a community workshop"
@@ -204,20 +196,15 @@
               <span class="absolute top-3 left-3 badge-teal text-xs">Workshop</span>
             </div>
             <div class="p-5">
-              <h3 class="font-heading font-semibold text-deep-teal text-base leading-snug mb-1">
-                Skills Development Workshop
+              <h3 class="font-heading font-semibold text-deep-teal text-base leading-snug mb-2">
+                Community Workshops
               </h3>
-              <p class="text-xs text-gray-500 flex items-center gap-1 mb-3">
-                <svg class="w-3.5 h-3.5 flex-shrink-0" xmlns="http://www.w3.org/2000/svg"
-                     fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/>
-                </svg>
-                Sign in to view event details
+              <p class="text-xs text-gray-500 mb-4">
+                Interactive skill-building sessions, digital literacy classes, and civic engagement workshops.
               </p>
-              <a href="/pages/auth/login.html"
+              <a href="/pages/events/index.html"
                  class="btn-secondary text-xs w-full justify-center">
-                Log in to register
+                Browse all events →
               </a>
             </div>
           </article>
@@ -225,7 +212,7 @@
         </div>
 
         <div class="mt-8 text-center sm:hidden">
-          <a href="/pages/events/index.html" class="btn-secondary text-sm">View all events</a>
+          <a href="/pages/events/index.html" class="btn-secondary text-sm">Browse all events</a>
         </div>
 
       </div>
@@ -373,6 +360,7 @@
               Explore Events
             </a>
             <a href="/pages/auth/signup.html"
+               id="bottom-cta-secondary"
                class="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-md border-2 border-soft-mint/40
                       text-soft-mint font-medium text-sm hover:bg-white/10 transition-colors duration-150">
               Sign Up Free

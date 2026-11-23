@@ -94,3 +94,59 @@ export function showToast(message, type = 'info', durationMs = 4000) {
     setTimeout(() => toast.remove(), 300);
   }, durationMs);
 }
+
+/**
+ * Resolves event category and image with approved category fallback photography.
+ * @param {Object} event - Event record from backend.
+ * @returns {{ category: string, image: string, fallbackImage: string }}
+ */
+export function getCategoryInfo(event) {
+  let cat = event?.metadata?.category;
+  if (!cat && typeof event?.metadata === 'string') {
+    try {
+      const parsed = JSON.parse(event.metadata);
+      cat = parsed.category;
+    } catch {
+      // Ignore parse error
+    }
+  }
+
+  if (!cat) {
+    const text = `${event?.title || ''} ${event?.description || ''}`.toLowerCase();
+    if (text.includes('clean-up') || text.includes('environment') || text.includes('park') || text.includes('recycle') || text.includes('green')) {
+      cat = 'Environment';
+    } else if (text.includes('culture') || text.includes('cultural') || text.includes('festival') || text.includes('music') || text.includes('heritage')) {
+      cat = 'Cultural';
+    } else if (text.includes('workshop') || text.includes('skills') || text.includes('training') || text.includes('class') || text.includes('learn')) {
+      cat = 'Workshop';
+    } else if (text.includes('sport') || text.includes('sports') || text.includes('marathon') || text.includes('tournament') || text.includes('fitness')) {
+      cat = 'Sports';
+    } else if (text.includes('volunteer') || text.includes('volunteering') || text.includes('social') || text.includes('charity')) {
+      cat = 'Volunteering';
+    } else {
+      cat = 'Community';
+    }
+  }
+
+  // Normalize category casing (e.g. "community" -> "Community")
+  cat = cat.trim();
+  cat = cat.charAt(0).toUpperCase() + cat.slice(1).toLowerCase();
+
+  const fallbackImages = {
+    'Community': '/assets/images/event-community.jpg',
+    'Cultural': '/assets/images/event-cultural-festival.jpg',
+    'Workshop': '/assets/images/event-workshop.jpg',
+    'Sports': '/assets/images/event-sports.jpg',
+    'Environment': '/assets/images/event-environment.png',
+    'Volunteering': '/assets/images/event-volunteering.jpg',
+  };
+
+  const fallback = fallbackImages[cat] || fallbackImages['Community'];
+  const image = event?.metadata?.image_url || fallback;
+
+  return {
+    category: cat,
+    image,
+    fallbackImage: fallback,
+  };
+}

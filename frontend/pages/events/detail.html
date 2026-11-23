@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="View full civic event details, schedule, venue location, and community attendance instructions.">
+  <title>Event Details — CivicEvents</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/output.css">
+  <link rel="icon" type="image/svg+xml" href="/assets/icons/civicevents-mark.svg">
+</head>
+<body class="font-body bg-off-white flex flex-col min-h-screen text-gray-800">
+
+  <!-- Skip link for keyboard accessibility -->
+  <a href="#main-content"
+     class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-teal focus:text-white focus:rounded-md focus:shadow-md">
+    Skip to main content
+  </a>
+
+  <!-- Application shell: header injected by components.js -->
+  <div id="site-header"></div>
+
+  <!-- Breadcrumb navigation -->
+  <div class="bg-white border-b border-gray-200">
+    <div class="container-content py-3">
+      <nav aria-label="Breadcrumb">
+        <ol class="flex items-center space-x-2 text-xs text-gray-500 truncate">
+          <li>
+            <a href="/index.html" class="hover:text-teal">Home</a>
+          </li>
+          <li class="flex items-center space-x-2">
+            <span class="text-gray-400">/</span>
+            <a href="/pages/events/index.html" class="hover:text-teal">Events</a>
+          </li>
+          <li class="flex items-center space-x-2 truncate">
+            <span class="text-gray-400">/</span>
+            <span class="text-gray-800 font-medium truncate" id="breadcrumb-title" aria-current="page">Event Details</span>
+          </li>
+        </ol>
+      </nav>
+    </div>
+  </div>
+
+  <main class="flex-1 py-8 sm:py-12" id="main-content">
+    <div class="container-content">
+
+      <!-- Back button -->
+      <div class="mb-6">
+        <a href="/pages/events/index.html"
+           class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-teal hover:text-deep-teal transition-colors">
+          <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+               stroke-width="2" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+          </svg>
+          Back to all events
+        </a>
+      </div>
+
+      <!-- Loading Skeleton State -->
+      <div id="event-loading" class="space-y-6" aria-label="Loading event details">
+        <div class="skeleton h-8 w-1/3"></div>
+        <div class="skeleton h-10 w-2/3"></div>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div class="lg:col-span-2 space-y-6">
+            <div class="skeleton h-72 sm:h-96 w-full rounded-lg"></div>
+            <div class="skeleton h-6 w-1/4"></div>
+            <div class="skeleton h-24 w-full"></div>
+            <div class="skeleton h-24 w-full"></div>
+          </div>
+          <div class="space-y-6">
+            <div class="card p-6 space-y-4">
+              <div class="skeleton h-6 w-1/2"></div>
+              <div class="skeleton h-4 w-3/4"></div>
+              <div class="skeleton h-4 w-2/3"></div>
+              <div class="skeleton h-10 w-full"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Guest Prompt Banner (Displayed when visitor is not logged in) -->
+      <div id="guest-prompt-container" class="card p-8 sm:p-12 text-center bg-white border-2 border-teal/20 max-w-xl mx-auto hidden">
+        <div class="w-14 h-14 rounded-full bg-soft-mint text-deep-teal mx-auto flex items-center justify-center mb-4">
+          <svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+               stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+          </svg>
+        </div>
+        <h2 class="font-heading text-2xl font-bold text-deep-teal mb-2">
+          Sign In to Access Event Details
+        </h2>
+        <p class="text-sm text-gray-600 leading-relaxed mb-6">
+          Civic event schedules, venue directions, and registrations are available to registered community members. Please log in or sign up to continue.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+          <a id="guest-login-link" href="/pages/auth/login.html" class="btn-primary py-2.5 px-6 text-sm">
+            Log in to view event
+          </a>
+          <a href="/pages/auth/signup.html" class="btn-secondary py-2.5 px-6 text-sm">
+            Create a free account
+          </a>
+        </div>
+      </div>
+
+      <!-- Error State (404, 500, or invalid ID) -->
+      <div id="event-error" class="card p-8 sm:p-12 text-center max-w-xl mx-auto hidden" role="alert">
+        <div class="w-14 h-14 rounded-full bg-red-100 text-red-600 mx-auto flex items-center justify-center mb-4">
+          <svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+               stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"/>
+          </svg>
+        </div>
+        <h2 class="font-heading text-xl font-bold text-gray-900 mb-2" id="error-title">Event Not Found</h2>
+        <p class="text-sm text-gray-600 mb-6" id="error-message">
+          The event you are looking for may have been removed, cancelled, or the link provided is invalid.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+          <a href="/pages/events/index.html" class="btn-primary py-2.5 px-6 text-sm">
+            Browse All Events
+          </a>
+          <button type="button" id="retry-btn" class="btn-secondary py-2.5 px-6 text-sm hidden">
+            Try Again
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Event Detail Content -->
+      <div id="event-content" class="hidden">
+        
+        <!-- Header Info -->
+        <header class="mb-6">
+          <div class="flex flex-wrap items-center gap-3 mb-2.5">
+            <span id="event-category-badge" class="badge-teal text-xs font-semibold px-2.5 py-1">
+              Category
+            </span>
+            <span id="event-status-badge" class="badge bg-gray-100 text-gray-700 text-xs">
+              Upcoming
+            </span>
+          </div>
+          <h1 id="event-title" class="text-2xl sm:text-3xl lg:text-4xl font-heading font-extrabold text-deep-teal tracking-tight">
+            Event Title
+          </h1>
+        </header>
+
+        <!-- Two-column Responsive Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          
+          <!-- Left / Main Column: Imagery & Details -->
+          <div class="lg:col-span-2 space-y-8">
+            
+            <!-- Hero Event Image -->
+            <div class="card overflow-hidden">
+              <div class="relative w-full h-64 sm:h-80 md:h-96 bg-gray-100">
+                <img id="event-image"
+                     src="/assets/images/event-community.jpg"
+                     alt="Event banner"
+                     class="w-full h-full object-cover">
+              </div>
+            </div>
+
+            <!-- About Section -->
+            <section class="card p-6 sm:p-8" aria-labelledby="about-heading">
+              <h2 id="about-heading" class="text-xl font-heading font-bold text-deep-teal mb-4">
+                About This Event
+              </h2>
+              <div id="event-description" class="prose max-w-none text-gray-700 text-sm sm:text-base leading-relaxed space-y-4 whitespace-pre-line">
+                <!-- Description populated by script -->
+              </div>
+            </section>
+
+            <!-- Community Guidelines & Participation Notes -->
+            <section class="card p-6 sm:p-8 bg-soft-mint/20 border-teal/20" aria-labelledby="guidelines-heading">
+              <h2 id="guidelines-heading" class="text-base font-heading font-bold text-deep-teal mb-2 flex items-center gap-2">
+                <svg class="w-5 h-5 text-teal flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                     stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                </svg>
+                Community Gathering Guidelines
+              </h2>
+              <p class="text-xs sm:text-sm text-gray-600 leading-relaxed">
+                All attendees are asked to adhere to city civic event etiquette, arrive on time, and follow instructions provided by event coordinators on site.
+              </p>
+            </section>
+
+          </div>
+
+          <!-- Right / Sidebar Column: Details & Registration Action -->
+          <aside class="space-y-6" aria-label="Event summary and registration">
+            
+            <!-- Event Schedule & Location Card -->
+            <div class="card p-6 space-y-5">
+              <h3 class="font-heading font-bold text-deep-teal text-base border-b border-gray-100 pb-3">
+                Event Information
+              </h3>
+
+              <!-- Date & Time -->
+              <div class="flex items-start gap-3">
+                <div class="w-9 h-9 rounded-lg bg-soft-mint text-deep-teal flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                       stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/>
+                  </svg>
+                </div>
+                <div>
+                  <span class="block text-xs font-semibold text-gray-500 uppercase tracking-wider">Date & Time</span>
+                  <p id="event-start-time" class="text-sm font-medium text-gray-900 mt-0.5"></p>
+                  <p id="event-end-time" class="text-xs text-gray-500 mt-0.5 hidden"></p>
+                </div>
+              </div>
+
+              <!-- Location -->
+              <div class="flex items-start gap-3">
+                <div class="w-9 h-9 rounded-lg bg-soft-mint text-deep-teal flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                       stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"/>
+                  </svg>
+                </div>
+                <div>
+                  <span class="block text-xs font-semibold text-gray-500 uppercase tracking-wider">Location / Venue</span>
+                  <p id="event-location" class="text-sm font-medium text-gray-900 mt-0.5"></p>
+                </div>
+              </div>
+
+              <!-- Registration Box (Stage 4 Notice) -->
+              <div class="pt-4 border-t border-gray-100">
+                <div class="bg-gray-50 rounded-lg p-4 border border-gray-200 text-center">
+                  <span class="inline-flex items-center gap-1 badge-teal text-xs mb-2">
+                    <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+                    </svg>
+                    Registration Notice
+                  </span>
+                  <p class="text-xs text-gray-600 mb-3">
+                    Event registration and attendee reservations will be enabled in <strong>Stage 4</strong>.
+                  </p>
+                  <button type="button"
+                          class="btn-primary w-full justify-center opacity-60 cursor-not-allowed text-xs py-2.5"
+                          disabled
+                          title="Registration opens in Stage 4">
+                    Register for Event (Stage 4)
+                  </button>
+                  <p class="text-[11px] text-gray-400 mt-2">
+                    No action required today. Check back when Stage 4 is active.
+                  </p>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Share / Portal Info -->
+            <div class="card p-5 bg-white text-xs text-gray-500 space-y-2">
+              <p class="font-medium text-gray-700">Civic Events Portal</p>
+              <p>Organized by the City Community Outreach and Services Department.</p>
+            </div>
+
+          </aside>
+
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Application shell: footer injected by components.js -->
+  <div id="site-footer"></div>
+
+  <!-- jQuery from node_modules (loaded locally, no CDN) -->
+  <script src="/node_modules/jquery/dist/jquery.min.js"></script>
+
+  <!-- Page module -->
+  <script type="module" src="/js/pages/event-detail.js"></script>
+
+</body>
+</html>
+
