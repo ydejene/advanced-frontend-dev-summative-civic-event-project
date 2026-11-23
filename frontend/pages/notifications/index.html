@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Stay updated with official municipal notices, civic broadcast alerts, and event updates in your CivicEvents inbox.">
+  <title>Notifications Inbox — CivicEvents</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/output.css">
+  <link rel="icon" type="image/svg+xml" href="/assets/icons/civicevents-mark.svg">
+</head>
+<body class="font-body bg-off-white flex flex-col min-h-screen text-gray-800">
+
+  <!-- Skip link for keyboard accessibility -->
+  <a href="#main-content"
+     class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-teal focus:text-white focus:rounded-md focus:shadow-md">
+    Skip to main content
+  </a>
+
+  <!-- Application shell: header injected by components.js -->
+  <div id="site-header"></div>
+
+  <!-- Breadcrumb navigation -->
+  <div class="bg-white border-b border-gray-200">
+    <div class="container-content py-3">
+      <nav aria-label="Breadcrumb">
+        <ol class="flex items-center space-x-2 text-xs text-gray-500">
+          <li>
+            <a href="/index.html" class="hover:text-teal">Home</a>
+          </li>
+          <li class="flex items-center space-x-2">
+            <span class="text-gray-400">/</span>
+            <span class="text-gray-800 font-medium" aria-current="page">Notifications</span>
+          </li>
+        </ol>
+      </nav>
+    </div>
+  </div>
+
+  <main class="flex-1 py-8 sm:py-12" id="main-content">
+    <div class="container-content">
+
+      <!-- Page Header -->
+      <header class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+        <div>
+          <div class="flex items-center gap-2 mb-2 flex-wrap">
+            <span class="badge-teal text-xs font-semibold px-2.5 py-1">Community Bulletins</span>
+            <span id="unread-count-pill" class="badge bg-warm-amber text-deep-teal text-xs font-bold px-2 py-0.5 rounded-full hidden">
+              <!-- e.g. 3 Unread -->
+            </span>
+          </div>
+          <h1 class="text-2xl sm:text-3xl font-heading font-extrabold text-deep-teal tracking-tight">
+            Notifications Inbox
+          </h1>
+          <p class="text-sm sm:text-base text-gray-600 mt-1 max-w-2xl leading-relaxed">
+            Review official announcements, event updates, civic promotions, and platform activity.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-3 flex-wrap self-start md:self-auto">
+          <button type="button" id="mark-all-read-btn" class="btn-secondary text-xs sm:text-sm py-2 px-3.5 inline-flex items-center gap-1.5 cursor-pointer">
+            <svg class="w-4 h-4 text-teal" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+            Mark All as Read
+          </button>
+
+          <div id="admin-manage-link-container" class="hidden">
+            <a href="/pages/admin/notifications.html" class="btn-primary text-xs sm:text-sm py-2 px-3.5 inline-flex items-center gap-1.5">
+              <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+              Admin Console
+            </a>
+          </div>
+        </div>
+      </header>
+
+      <!-- Search & Filter Controls Card -->
+      <section class="card p-4 sm:p-5 mb-8" aria-label="Notification filters">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <!-- Keyword Search -->
+          <div class="relative lg:col-span-2">
+            <label for="notif-search" class="sr-only">Search notifications</label>
+            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+              <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/>
+              </svg>
+            </div>
+            <input type="search"
+                   id="notif-search"
+                   placeholder="Search by title or message text…"
+                   class="form-input pl-10 pr-9 py-2 text-sm"
+                   autocomplete="off">
+            <button type="button"
+                    id="search-clear-btn"
+                    class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 hidden cursor-pointer"
+                    aria-label="Clear search">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Status Filter -->
+          <div>
+            <label for="filter-status" class="sr-only">Filter by read status</label>
+            <select id="filter-status" class="form-input py-2 text-xs">
+              <option value="all">All Statuses</option>
+              <option value="unread">Unread Only</option>
+              <option value="read">Read Only</option>
+            </select>
+          </div>
+
+          <!-- Type Filter -->
+          <div>
+            <label for="filter-type" class="sr-only">Filter by notification type</label>
+            <select id="filter-type" class="form-input py-2 text-xs">
+              <option value="all">All Types</option>
+              <option value="announcement">Announcements</option>
+              <option value="promo">Promotions</option>
+              <option value="event">Events</option>
+              <option value="registration">Registrations</option>
+              <option value="system">System Alerts</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <!-- Loading State -->
+      <div id="notifications-loading" class="space-y-4" aria-live="polite" aria-busy="true">
+        <div class="card p-6 animate-pulse space-y-3">
+          <div class="h-4 bg-gray-200 rounded w-1/4"></div>
+          <div class="h-5 bg-gray-200 rounded w-3/4"></div>
+          <div class="h-3 bg-gray-100 rounded w-1/2"></div>
+        </div>
+        <div class="card p-6 animate-pulse space-y-3">
+          <div class="h-4 bg-gray-200 rounded w-1/5"></div>
+          <div class="h-5 bg-gray-200 rounded w-2/3"></div>
+          <div class="h-3 bg-gray-100 rounded w-1/3"></div>
+        </div>
+      </div>
+
+      <!-- Error State -->
+      <div id="notifications-error" class="card p-8 text-center max-w-lg mx-auto hidden" role="alert">
+        <div class="w-12 h-12 mx-auto rounded-full bg-red-100 text-red-600 flex items-center justify-center mb-4">
+          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+        </div>
+        <h3 class="font-heading text-lg font-bold text-gray-900 mb-1">Failed to Load Notifications</h3>
+        <p class="text-sm text-gray-600 mb-6" id="error-message">Unable to fetch notifications from the portal right now.</p>
+        <button type="button" id="retry-btn" class="btn-primary text-sm">Try Again</button>
+      </div>
+
+      <!-- Empty State -->
+      <div id="notifications-empty" class="card p-10 text-center max-w-md mx-auto hidden">
+        <div class="w-14 h-14 mx-auto rounded-full bg-soft-mint text-deep-teal flex items-center justify-center mb-4">
+          <svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"/>
+          </svg>
+        </div>
+        <h3 class="font-heading text-lg font-bold text-deep-teal mb-1" id="empty-title">Inbox Zero!</h3>
+        <p class="text-sm text-gray-500 mb-4" id="empty-desc">
+          You have no notifications in your inbox right now. When announcements or updates occur, they will appear here.
+        </p>
+        <button type="button" id="empty-reset-btn" class="btn-secondary text-xs hidden">Reset Filters</button>
+      </div>
+
+      <!-- Notifications Feed List -->
+      <section id="notifications-list" class="space-y-4 hidden" aria-label="Notifications list">
+        <!-- Rendered dynamically by notifications.js -->
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Admin Delete Confirmation Modal -->
+  <div id="delete-modal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 hidden" role="dialog" aria-modal="true" aria-labelledby="delete-modal-title">
+    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full overflow-hidden animate-fadeIn p-6">
+      <div class="w-12 h-12 mx-auto rounded-full bg-red-100 text-red-600 flex items-center justify-center mb-4">
+        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+        </svg>
+      </div>
+      <h3 id="delete-modal-title" class="font-heading font-bold text-lg text-gray-900 text-center mb-2">
+        Delete Notification?
+      </h3>
+      <p class="text-sm text-gray-600 text-center mb-6" id="delete-modal-desc">
+        Are you sure you want to permanently delete this notification? If this is a broadcast bulletin, it will be removed for all portal users.
+      </p>
+      <div class="flex items-center justify-center gap-3">
+        <button type="button" id="cancel-delete-btn" class="btn-secondary text-sm">Cancel</button>
+        <button type="button" id="confirm-delete-btn" class="px-5 py-2 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 rounded-md cursor-pointer transition">
+          Yes, Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Application shell: footer injected by components.js -->
+  <div id="site-footer"></div>
+
+  <!-- Local jQuery -->
+  <script src="/node_modules/jquery/dist/jquery.min.js"></script>
+
+  <!-- Page script module -->
+  <script type="module" src="/js/pages/notifications.js"></script>
+
+</body>
+</html>
+

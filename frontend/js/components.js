@@ -4,7 +4,15 @@
  * Supports cross-tab synchronization so navigation updates when auth state changes.
  */
 import { isAuthenticated, isAdmin, getUser, logout } from './auth.js';
-import { escapeHtml } from './utils.js';
+import { escapeHtml, timeAgo } from './utils.js';
+import {
+  updateNotificationBadge,
+  fetchNotifications,
+  getReadNotificationIds,
+  markAsRead,
+  markAllAsRead,
+  resolveNotificationLink
+} from './notifications.js';
 
 let currentShellPage = '';
 
@@ -50,7 +58,8 @@ function headerHTML(activePage = '') {
       ? `<a href="/pages/admin/dashboard.html" class="block px-4 py-2 text-sm text-teal font-medium hover:bg-soft-mint" role="menuitem">Admin Dashboard</a>
          <a href="/pages/admin/feedback.html" class="block px-4 py-2 text-sm text-teal font-medium hover:bg-soft-mint" role="menuitem">Event Feedback</a>
          <a href="/pages/admin/announcements.html" class="block px-4 py-2 text-sm text-teal font-medium hover:bg-soft-mint" role="menuitem">Manage Announcements</a>
-         <a href="/pages/admin/promotions.html" class="block px-4 py-2 text-sm text-teal font-medium hover:bg-soft-mint" role="menuitem">Manage Promotions</a>`
+         <a href="/pages/admin/promotions.html" class="block px-4 py-2 text-sm text-teal font-medium hover:bg-soft-mint" role="menuitem">Manage Promotions</a>
+         <a href="/pages/admin/notifications.html" class="block px-4 py-2 text-sm text-teal font-medium hover:bg-soft-mint" role="menuitem">Manage Notifications</a>`
       : '';
     authControls = `
       <div class="relative" id="profile-menu">
@@ -92,22 +101,50 @@ function headerHTML(activePage = '') {
       <a href="/pages/auth/signup.html" class="btn-primary text-xs px-4 py-2">Sign up</a>`;
   }
 
-  /* Notification bell — visible only when authenticated. */
+  /* Notification bell dropdown — visible only when authenticated. */
   const notificationBell = authenticated ? `
-    <a href="/pages/notifications/index.html"
-       class="relative p-1 text-gray-500 hover:text-teal focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal"
-       aria-label="Notifications">
-      <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-           stroke-width="1.5" stroke="currentColor" aria-hidden="true">
-        <path stroke-linecap="round" stroke-linejoin="round"
-              d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"/>
-      </svg>
-      <span id="notif-badge"
-            class="absolute -top-0.5 -right-0.5 w-4 h-4 text-xs bg-warm-amber text-deep-teal rounded-full hidden
-                   flex items-center justify-center font-bold"
-            aria-label="unread notifications">
-      </span>
-    </a>` : '';
+    <div class="relative" id="notif-menu-container">
+      <button type="button"
+              id="notif-menu-btn"
+              class="relative p-1.5 text-gray-500 hover:text-teal focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal rounded-full cursor-pointer"
+              aria-haspopup="true" aria-expanded="false" aria-controls="notif-dropdown"
+              aria-label="Notifications">
+        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+             stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"/>
+        </svg>
+        <span id="notif-badge"
+              class="absolute -top-0.5 -right-0.5 px-1 min-w-[16px] h-4 text-[10px] bg-warm-amber text-deep-teal rounded-full font-bold hidden flex items-center justify-center leading-none"
+              aria-label="unread notifications count">
+        </span>
+      </button>
+
+      <!-- Accessible Notification Dropdown -->
+      <div id="notif-dropdown"
+           class="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-xl shadow-xl border border-gray-200 py-0 z-50 hidden overflow-hidden animate-fadeIn"
+           role="region" aria-label="Notifications preview">
+        <div class="p-3 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <h3 class="text-sm font-heading font-bold text-deep-teal">Notifications</h3>
+            <span id="notif-dropdown-count" class="badge-teal text-[11px] px-1.5 py-0.2 rounded-full hidden"></span>
+          </div>
+          <button type="button" id="notif-dropdown-mark-all" class="text-xs text-teal hover:text-deep-teal font-medium cursor-pointer">
+            Mark all as read
+          </button>
+        </div>
+
+        <div id="notif-dropdown-list" class="max-h-72 overflow-y-auto divide-y divide-gray-100" role="feed" aria-live="polite">
+          <div class="p-4 text-center text-xs text-gray-500">Loading notifications…</div>
+        </div>
+
+        <div class="p-2.5 bg-gray-50 border-t border-gray-100 text-center">
+          <a href="/pages/notifications/index.html" class="text-xs font-semibold text-teal hover:text-deep-teal inline-flex items-center gap-1">
+            View full notifications inbox &rarr;
+          </a>
+        </div>
+      </div>
+    </div>` : '';
 
   return `
 <header class="sticky top-0 z-40 bg-white border-b border-gray-200 shadow-sm">
@@ -177,7 +214,10 @@ function headerHTML(activePage = '') {
         <a href="/pages/user/registrations.html"
            class="block px-3 py-2.5 rounded-md text-sm font-medium text-gray-700 hover:bg-soft-mint">My Registrations</a>
         <a href="/pages/notifications/index.html"
-           class="block px-3 py-2.5 rounded-md text-sm font-medium text-gray-700 hover:bg-soft-mint">Notifications</a>
+           class="flex items-center justify-between px-3 py-2.5 rounded-md text-sm font-medium text-gray-700 hover:bg-soft-mint">
+          <span>Notifications</span>
+          <span id="mobile-notif-badge" class="px-2 py-0.5 text-xs bg-warm-amber text-deep-teal rounded-full font-bold hidden"></span>
+        </a>
         ${admin ? `<a href="/pages/admin/dashboard.html"
                       class="block px-3 py-2.5 rounded-md text-sm font-medium text-teal font-semibold hover:bg-soft-mint">Admin Dashboard</a>
                    <a href="/pages/admin/feedback.html"
@@ -185,7 +225,9 @@ function headerHTML(activePage = '') {
                    <a href="/pages/admin/announcements.html"
                       class="block px-3 py-2.5 rounded-md text-sm font-medium text-teal font-semibold hover:bg-soft-mint">Manage Announcements</a>
                    <a href="/pages/admin/promotions.html"
-                      class="block px-3 py-2.5 rounded-md text-sm font-medium text-teal font-semibold hover:bg-soft-mint">Manage Promotions</a>` : ''}
+                      class="block px-3 py-2.5 rounded-md text-sm font-medium text-teal font-semibold hover:bg-soft-mint">Manage Promotions</a>
+                   <a href="/pages/admin/notifications.html"
+                      class="block px-3 py-2.5 rounded-md text-sm font-medium text-teal font-semibold hover:bg-soft-mint">Manage Notifications</a>` : ''}
         <button type="button" id="mobile-logout-btn"
                 class="block w-full text-left px-3 py-2.5 rounded-md text-sm font-medium text-red-600 hover:bg-red-50 cursor-pointer">Logout</button>
       ` : `
@@ -345,6 +387,134 @@ function attachHeaderHandlers() {
     });
   }
 
+  /* Notification bell dropdown toggle */
+  const notifBtn = document.getElementById('notif-menu-btn');
+  const notifDropdown = document.getElementById('notif-dropdown');
+  const notifDropdownList = document.getElementById('notif-dropdown-list');
+  const notifCountBadge = document.getElementById('notif-dropdown-count');
+  const notifMarkAllBtn = document.getElementById('notif-dropdown-mark-all');
+
+  function renderDropdownItems(items) {
+    if (!notifDropdownList) return;
+    const userId = getUser()?.id;
+    const readSet = getReadNotificationIds(userId);
+    const unreadCount = items.filter((n) => !readSet.has(String(n.id))).length;
+
+    if (notifCountBadge) {
+      if (unreadCount > 0) {
+        notifCountBadge.textContent = `${unreadCount} unread`;
+        notifCountBadge.classList.remove('hidden');
+      } else {
+        notifCountBadge.classList.add('hidden');
+      }
+    }
+
+    if (items.length === 0) {
+      notifDropdownList.innerHTML = `
+        <div class="p-6 text-center text-gray-500">
+          <svg class="w-8 h-8 mx-auto text-gray-300 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"/>
+          </svg>
+          <p class="text-xs">No notifications yet.</p>
+        </div>`;
+      return;
+    }
+
+    const topItems = items.slice(0, 5);
+    notifDropdownList.innerHTML = topItems.map((item) => {
+      const isRead = readSet.has(String(item.id));
+      const targetLink = resolveNotificationLink(item) || '/pages/notifications/index.html';
+      const typeBadge = `<span class="text-[10px] uppercase font-bold text-teal tracking-wider">${escapeHtml(item.type || 'system')}</span>`;
+
+      return `
+        <a href="${targetLink}"
+           class="dropdown-notif-item block p-3 hover:bg-soft-mint/40 transition-colors ${isRead ? 'opacity-70 bg-white' : 'bg-soft-mint/15 font-medium'}"
+           data-id="${item.id}"
+           data-link="${targetLink}">
+          <div class="flex items-start justify-between gap-2 mb-1">
+            ${typeBadge}
+            <span class="text-[11px] text-gray-400 whitespace-nowrap">${timeAgo(item.created_at)}</span>
+          </div>
+          <h4 class="text-xs text-gray-900 leading-snug line-clamp-1 ${isRead ? 'font-normal' : 'font-semibold'}">
+            ${!isRead ? '<span class="inline-block w-1.5 h-1.5 rounded-full bg-teal mr-1"></span>' : ''}
+            ${escapeHtml(item.title)}
+          </h4>
+          <p class="text-[11px] text-gray-500 line-clamp-2 mt-0.5 leading-tight">
+            ${escapeHtml(item.message)}
+          </p>
+        </a>
+      `;
+    }).join('');
+
+    notifDropdownList.querySelectorAll('.dropdown-notif-item').forEach((el) => {
+      el.addEventListener('click', () => {
+        const id = el.getAttribute('data-id');
+        markAsRead(id, userId);
+      });
+    });
+  }
+
+  function loadDropdownNotifications() {
+    if (!isAuthenticated()) return;
+    if (notifDropdownList) {
+      notifDropdownList.innerHTML = '<div class="p-4 text-center text-xs text-gray-500 animate-pulse">Loading notifications…</div>';
+    }
+    fetchNotifications()
+      .done((res) => {
+        const items = Array.isArray(res?.data) ? res.data : [];
+        renderDropdownItems(items);
+      })
+      .fail(() => {
+        if (notifDropdownList) {
+          notifDropdownList.innerHTML = '<div class="p-4 text-center text-xs text-red-500">Failed to load notifications.</div>';
+        }
+      });
+  }
+
+  if (notifBtn && notifDropdown) {
+    notifBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      profileDropdown?.classList.add('hidden');
+      profileBtn?.setAttribute('aria-expanded', 'false');
+
+      const isHidden = notifDropdown.classList.toggle('hidden');
+      notifBtn.setAttribute('aria-expanded', String(!isHidden));
+      if (!isHidden) {
+        loadDropdownNotifications();
+      }
+    });
+
+    notifMarkAllBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const userId = getUser()?.id;
+      fetchNotifications().done((res) => {
+        const items = Array.isArray(res?.data) ? res.data : [];
+        const ids = items.map((n) => n.id);
+        markAllAsRead(ids, userId);
+        renderDropdownItems(items);
+        updateNotificationBadge();
+      });
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!notifDropdown.contains(e.target) && e.target !== notifBtn) {
+        notifDropdown.classList.add('hidden');
+        notifBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !notifDropdown.classList.contains('hidden')) {
+        notifDropdown.classList.add('hidden');
+        notifBtn.setAttribute('aria-expanded', 'false');
+        notifBtn.focus();
+      }
+    });
+  }
+
+  // Update notification badge on initialization
+  updateNotificationBadge();
+
   /* Logout handlers (desktop and mobile) — clears session and redirects */
   ['logout-btn', 'mobile-logout-btn'].forEach(id => {
     document.getElementById(id)?.addEventListener('click', () => {
@@ -371,5 +541,9 @@ if (typeof window !== 'undefined') {
     if (footerEl) {
       footerEl.innerHTML = footerHTML();
     }
+  });
+
+  window.addEventListener('notifications-updated', () => {
+    updateNotificationBadge();
   });
 }
