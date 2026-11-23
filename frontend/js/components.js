@@ -47,7 +47,8 @@ function headerHTML(activePage = '') {
   if (authenticated) {
     const displayName = escapeHtml(user?.full_name?.split(' ')[0] ?? 'Account');
     const adminLink = admin
-      ? `<a href="/pages/admin/dashboard.html" class="block px-4 py-2 text-sm text-teal font-medium hover:bg-soft-mint" role="menuitem">Admin Dashboard</a>`
+      ? `<a href="/pages/admin/dashboard.html" class="block px-4 py-2 text-sm text-teal font-medium hover:bg-soft-mint" role="menuitem">Admin Dashboard</a>
+         <a href="/pages/admin/feedback.html" class="block px-4 py-2 text-sm text-teal font-medium hover:bg-soft-mint" role="menuitem">Event Feedback</a>`
       : '';
     authControls = `
       <div class="relative" id="profile-menu">
@@ -176,7 +177,9 @@ function headerHTML(activePage = '') {
         <a href="/pages/notifications/index.html"
            class="block px-3 py-2.5 rounded-md text-sm font-medium text-gray-700 hover:bg-soft-mint">Notifications</a>
         ${admin ? `<a href="/pages/admin/dashboard.html"
-                      class="block px-3 py-2.5 rounded-md text-sm font-medium text-teal font-semibold hover:bg-soft-mint">Admin Dashboard</a>` : ''}
+                      class="block px-3 py-2.5 rounded-md text-sm font-medium text-teal font-semibold hover:bg-soft-mint">Admin Dashboard</a>
+                   <a href="/pages/admin/feedback.html"
+                      class="block px-3 py-2.5 rounded-md text-sm font-medium text-teal font-semibold hover:bg-soft-mint">Event Feedback</a>` : ''}
         <button type="button" id="mobile-logout-btn"
                 class="block w-full text-left px-3 py-2.5 rounded-md text-sm font-medium text-red-600 hover:bg-red-50 cursor-pointer">Logout</button>
       ` : `

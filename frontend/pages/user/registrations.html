@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Manage your civic event registrations, check dates and locations, or cancel your attendance.">
+  <title>My Event Registrations — CivicEvents</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/output.css">
+  <link rel="icon" type="image/svg+xml" href="/assets/icons/civicevents-mark.svg">
+</head>
+<body class="font-body bg-off-white flex flex-col min-h-screen text-gray-800">
+
+  <!-- Skip link for keyboard accessibility -->
+  <a href="#main-content"
+     class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-teal focus:text-white focus:rounded-md focus:shadow-md">
+    Skip to main content
+  </a>
+
+  <!-- Application shell: header injected by components.js -->
+  <div id="site-header"></div>
+
+  <!-- Breadcrumb navigation -->
+  <div class="bg-white border-b border-gray-200">
+    <div class="container-content py-3">
+      <nav aria-label="Breadcrumb">
+        <ol class="flex items-center space-x-2 text-xs text-gray-500">
+          <li>
+            <a href="/index.html" class="hover:text-teal">Home</a>
+          </li>
+          <li class="flex items-center space-x-2">
+            <span class="text-gray-400">/</span>
+            <span class="text-gray-500">My Account</span>
+          </li>
+          <li class="flex items-center space-x-2">
+            <span class="text-gray-400">/</span>
+            <span class="text-gray-800 font-medium" aria-current="page">My Registrations</span>
+          </li>
+        </ol>
+      </nav>
+    </div>
+  </div>
+
+  <main class="flex-1 py-8 sm:py-12" id="main-content">
+    <div class="container-content">
+
+      <!-- Page Header -->
+      <header class="mb-8">
+        <span class="badge-teal mb-2 inline-block">Community Account</span>
+        <h1 class="text-2xl sm:text-3xl font-heading font-extrabold text-deep-teal tracking-tight">
+          My Event Registrations
+        </h1>
+        <p class="text-sm sm:text-base text-gray-600 mt-1 max-w-2xl leading-relaxed">
+          Track your upcoming civic event registrations, check locations and schedules, or manage your attendance.
+        </p>
+      </header>
+
+      <!-- Filter Tabs & Stats Bar -->
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-gray-200 mb-6 pb-2">
+        <!-- Tabs -->
+        <div class="flex items-center gap-1 sm:gap-2" role="tablist" aria-label="Filter registrations by status">
+          <button type="button"
+                  id="tab-all"
+                  role="tab"
+                  aria-selected="true"
+                  class="px-3.5 py-2 text-xs sm:text-sm font-semibold border-b-2 border-teal text-teal cursor-pointer">
+            All (<span id="count-all">0</span>)
+          </button>
+          <button type="button"
+                  id="tab-registered"
+                  role="tab"
+                  aria-selected="false"
+                  class="px-3.5 py-2 text-xs sm:text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 cursor-pointer">
+            Confirmed (<span id="count-registered">0</span>)
+          </button>
+          <button type="button"
+                  id="tab-cancelled"
+                  role="tab"
+                  aria-selected="false"
+                  class="px-3.5 py-2 text-xs sm:text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 cursor-pointer">
+            Cancelled (<span id="count-cancelled">0</span>)
+          </button>
+        </div>
+
+        <a href="/pages/events/index.html" class="btn-secondary text-xs py-1.5 px-3 self-end sm:self-auto">
+          Explore More Events →
+        </a>
+      </div>
+
+      <!-- Loading Skeleton State -->
+      <div id="registrations-loading" class="space-y-4" aria-label="Loading your registrations">
+        <div class="card p-6 space-y-3">
+          <div class="skeleton h-5 w-1/4"></div>
+          <div class="skeleton h-7 w-1/2"></div>
+          <div class="skeleton h-4 w-1/3"></div>
+        </div>
+        <div class="card p-6 space-y-3">
+          <div class="skeleton h-5 w-1/4"></div>
+          <div class="skeleton h-7 w-1/2"></div>
+          <div class="skeleton h-4 w-1/3"></div>
+        </div>
+      </div>
+
+      <!-- Error State -->
+      <div id="registrations-error" class="card p-8 sm:p-10 text-center max-w-lg mx-auto hidden" role="alert">
+        <div class="w-12 h-12 rounded-full bg-red-100 text-red-600 mx-auto flex items-center justify-center mb-3">
+          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"/>
+          </svg>
+        </div>
+        <h2 class="font-heading text-lg font-bold text-gray-900 mb-1">Unable to Load Registrations</h2>
+        <p class="text-xs sm:text-sm text-gray-600 mb-4" id="registrations-error-msg">
+          There was an issue communicating with the event service. Please check your connection.
+        </p>
+        <button type="button" id="registrations-retry-btn" class="btn-primary text-xs py-2 px-5">
+          Try Again
+        </button>
+      </div>
+
+      <!-- Empty State -->
+      <div id="registrations-empty" class="card empty-state hidden">
+        <div class="w-14 h-14 rounded-full bg-soft-mint text-deep-teal flex items-center justify-center mb-4">
+          <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/>
+          </svg>
+        </div>
+        <h2 class="font-heading text-lg font-bold text-deep-teal mb-1" id="empty-state-title">
+          No Event Registrations Found
+        </h2>
+        <p class="text-xs sm:text-sm text-gray-500 max-w-md text-center mb-6" id="empty-state-desc">
+          You haven't registered for any civic events yet. Explore upcoming gatherings and workshops to get involved with your community.
+        </p>
+        <a href="/pages/events/index.html" class="btn-primary text-xs sm:text-sm py-2 px-6">
+          Browse City Events
+        </a>
+      </div>
+
+      <!-- Registrations Cards List -->
+      <div id="registrations-list" class="space-y-4 hidden" aria-label="Event registrations list">
+        <!-- Cards rendered dynamically by registrations.js -->
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Cancellation Confirmation Modal Dialog -->
+  <div id="cancel-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="card p-6 max-w-md w-full shadow-xl bg-white space-y-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center flex-shrink-0">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"/>
+          </svg>
+        </div>
+        <div>
+          <h3 id="modal-title" class="font-heading font-bold text-deep-teal text-base">
+            Cancel Event Registration
+          </h3>
+          <p class="text-xs text-gray-500">This action cannot be undone.</p>
+        </div>
+      </div>
+
+      <div class="text-xs sm:text-sm text-gray-600 space-y-2">
+        <p>
+          Are you sure you want to cancel your attendance for:
+        </p>
+        <p id="modal-event-name" class="font-semibold text-deep-teal bg-gray-50 p-2.5 rounded border border-gray-100">
+          <!-- Event Name -->
+        </p>
+        <p class="text-[11px] text-amber-800 bg-amber-50 p-2.5 rounded border border-amber-200">
+          <strong>Backend limitation notice:</strong> Cancelling releases your spot, but the database constraint prevents re-registering for this event later.
+        </p>
+      </div>
+
+      <div class="flex items-center justify-end gap-3 pt-2 border-t border-gray-100">
+        <button type="button" id="modal-abort-btn" class="btn-secondary text-xs py-2 px-4">
+          Keep My Registration
+        </button>
+        <button type="button" id="modal-confirm-btn" class="btn-destructive text-xs py-2 px-4">
+          Yes, Cancel Registration
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Application shell: footer injected by components.js -->
+  <div id="site-footer"></div>
+
+  <!-- jQuery from node_modules (loaded locally, no CDN) -->
+  <script src="/node_modules/jquery/dist/jquery.min.js"></script>
+
+  <!-- Page module -->
+  <script type="module" src="/js/pages/registrations.js"></script>
+
+</body>
+</html>
+
