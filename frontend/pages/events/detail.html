@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="View full civic event details, schedule, venue location, and community attendance instructions.">
+  <meta name="description" content="View full civic event details, schedule, venue location, attendee registration, and community feedback.">
   <title>Event Details — CivicEvents</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -149,7 +149,7 @@
         <!-- Two-column Responsive Layout -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
-          <!-- Left / Main Column: Imagery & Details -->
+          <!-- Left / Main Column: Imagery, Details, Guidelines, Feedback, Admin -->
           <div class="lg:col-span-2 space-y-8">
             
             <!-- Hero Event Image -->
@@ -185,6 +185,201 @@
               <p class="text-xs sm:text-sm text-gray-600 leading-relaxed">
                 All attendees are asked to adhere to city civic event etiquette, arrive on time, and follow instructions provided by event coordinators on site.
               </p>
+            </section>
+
+            <!-- ============================================================
+                 Event Feedback Section (Stage 4)
+                 Authenticated users can submit/update their feedback.
+                 Feedback records are restricted to administrators per backend ACL.
+                 ============================================================ -->
+            <section class="card p-6 sm:p-8" id="feedback-section" aria-labelledby="feedback-heading">
+              <div class="flex items-center justify-between mb-4 border-b border-gray-100 pb-3">
+                <div>
+                  <h2 id="feedback-heading" class="text-xl font-heading font-bold text-deep-teal">
+                    Attendee Feedback
+                  </h2>
+                  <p class="text-xs text-gray-500 mt-0.5">
+                    Share your experience with city event coordinators.
+                  </p>
+                </div>
+                <span class="badge-teal text-xs">Community Feedback</span>
+              </div>
+
+              <!-- Unauthenticated State -->
+              <div id="feedback-guest-view" class="p-6 text-center bg-gray-50 rounded-lg border border-gray-200 hidden">
+                <p class="text-sm text-gray-600 mb-3">
+                  Please log in to share feedback for this civic event.
+                </p>
+                <a href="/pages/auth/login.html" class="btn-primary text-xs py-2 px-5">Log in to Leave Feedback</a>
+              </div>
+
+              <!-- Existing User Feedback Display View -->
+              <div id="user-feedback-display" class="bg-soft-mint/30 border border-teal/30 rounded-lg p-5 mb-4 hidden">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-xs font-semibold text-deep-teal uppercase tracking-wider">Your Submitted Feedback</span>
+                  <button type="button" id="edit-feedback-btn" class="btn-secondary text-xs py-1 px-3">
+                    Edit Feedback
+                  </button>
+                </div>
+                <div class="flex items-center gap-1 mb-2 text-warm-amber" id="user-feedback-stars" aria-label="Rating">
+                  <!-- Star SVGs rendered dynamically -->
+                </div>
+                <p id="user-feedback-comment" class="text-sm text-gray-700 whitespace-pre-line"></p>
+                <p id="user-feedback-date" class="text-[11px] text-gray-400 mt-2"></p>
+              </div>
+
+              <!-- Feedback Form (New Submission or Editing) -->
+              <div id="feedback-form-container">
+                <form id="event-feedback-form" novalidate aria-label="Event feedback form">
+                  
+                  <!-- Form Status Banner -->
+                  <div id="feedback-form-alert" class="mb-4 p-3 rounded-md text-xs hidden" role="alert"></div>
+
+                  <!-- Star Rating Selection -->
+                  <div class="mb-4">
+                    <label class="form-label text-xs font-semibold text-gray-700 block mb-1.5">
+                      Your Rating <span class="text-red-500">*</span>
+                    </label>
+                    <div class="flex items-center gap-2" id="star-rating-group" role="radiogroup" aria-label="Rate this event from 1 to 5 stars">
+                      <button type="button" class="star-rating-btn p-1 text-gray-300 hover:text-warm-amber transition-colors focus:outline-none" data-rating="1" aria-label="1 star - Poor">
+                        <svg class="w-7 h-7 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                      </button>
+                      <button type="button" class="star-rating-btn p-1 text-gray-300 hover:text-warm-amber transition-colors focus:outline-none" data-rating="2" aria-label="2 stars - Fair">
+                        <svg class="w-7 h-7 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                      </button>
+                      <button type="button" class="star-rating-btn p-1 text-gray-300 hover:text-warm-amber transition-colors focus:outline-none" data-rating="3" aria-label="3 stars - Average">
+                        <svg class="w-7 h-7 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                      </button>
+                      <button type="button" class="star-rating-btn p-1 text-gray-300 hover:text-warm-amber transition-colors focus:outline-none" data-rating="4" aria-label="4 stars - Good">
+                        <svg class="w-7 h-7 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                      </button>
+                      <button type="button" class="star-rating-btn p-1 text-gray-300 hover:text-warm-amber transition-colors focus:outline-none" data-rating="5" aria-label="5 stars - Excellent">
+                        <svg class="w-7 h-7 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                      </button>
+                      <span id="star-rating-text" class="text-xs text-gray-500 font-medium ml-2">Select a rating</span>
+                    </div>
+                    <input type="hidden" id="selected-rating" name="rating" value="">
+                    <p id="rating-error" class="text-xs text-red-600 mt-1 hidden"></p>
+                  </div>
+
+                  <!-- Comment Textarea -->
+                  <div class="mb-4">
+                    <div class="flex items-center justify-between mb-1">
+                      <label for="feedback-comment" class="form-label text-xs font-semibold text-gray-700 mb-0">
+                        Comments or Suggestions
+                      </label>
+                      <span id="feedback-char-count" class="text-[11px] text-gray-400">0 / 1000</span>
+                    </div>
+                    <textarea id="feedback-comment"
+                              name="comment"
+                              rows="3"
+                              maxlength="1000"
+                              class="form-input text-xs sm:text-sm"
+                              placeholder="Tell organizers what you enjoyed or what could be improved..."></textarea>
+                    <p id="comment-error" class="text-xs text-red-600 mt-1 hidden"></p>
+                  </div>
+
+                  <!-- Submit Buttons -->
+                  <div class="flex items-center gap-3">
+                    <button type="submit" id="submit-feedback-btn" class="btn-primary text-xs py-2 px-5">
+                      Submit Feedback
+                    </button>
+                    <button type="button" id="cancel-edit-feedback-btn" class="btn-secondary text-xs py-2 px-4 hidden">
+                      Cancel
+                    </button>
+                  </div>
+
+                  <!-- Privacy & Admin Note -->
+                  <p class="text-[11px] text-gray-400 mt-3">
+                    Feedback is delivered directly to city coordinators to help improve future community programming.
+                  </p>
+                </form>
+              </div>
+            </section>
+
+            <!-- ============================================================
+                 Administrator Management Section (Stage 4)
+                 Visible only to accounts with role 'admin'
+                 ============================================================ -->
+            <section id="admin-management-section" class="card p-6 sm:p-8 border-2 border-teal/30 bg-white hidden" aria-labelledby="admin-section-heading">
+              <div class="flex flex-wrap items-center justify-between gap-2 mb-4 border-b border-gray-100 pb-3">
+                <div class="flex items-center gap-2">
+                  <span class="badge-teal text-xs font-semibold px-2.5 py-1">Administrator Access</span>
+                  <h2 id="admin-section-heading" class="text-lg font-heading font-bold text-deep-teal">
+                    Event Management Panel
+                  </h2>
+                </div>
+                <a href="/pages/admin/feedback.html" class="text-xs text-teal hover:underline font-medium">
+                  Open Feedback Hub →
+                </a>
+              </div>
+
+              <!-- Admin Tabs -->
+              <div class="flex border-b border-gray-200 mb-4" role="tablist">
+                <button type="button"
+                        id="admin-tab-attendees"
+                        role="tab"
+                        aria-selected="true"
+                        aria-controls="admin-panel-attendees"
+                        class="px-4 py-2 text-xs sm:text-sm font-semibold border-b-2 border-teal text-teal cursor-pointer">
+                  Attendees (<span id="admin-attendees-count">0</span>)
+                </button>
+                <button type="button"
+                        id="admin-tab-feedback"
+                        role="tab"
+                        aria-selected="false"
+                        aria-controls="admin-panel-feedback"
+                        class="px-4 py-2 text-xs sm:text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 cursor-pointer">
+                  Feedback Records (<span id="admin-feedback-count">0</span>)
+                </button>
+              </div>
+
+              <!-- Attendees Panel -->
+              <div id="admin-panel-attendees" role="tabpanel" aria-labelledby="admin-tab-attendees">
+                <div id="admin-attendees-loading" class="space-y-2 py-4">
+                  <div class="skeleton h-8 w-full"></div>
+                  <div class="skeleton h-8 w-full"></div>
+                </div>
+                <div id="admin-attendees-empty" class="text-center py-6 text-gray-500 text-xs hidden">
+                  No confirmed attendees registered for this event yet.
+                </div>
+                <div id="admin-attendees-table-wrap" class="overflow-x-auto hidden">
+                  <table class="w-full text-left text-xs border border-gray-200 rounded-md">
+                    <thead class="bg-gray-50 text-gray-700 font-semibold border-b border-gray-200">
+                      <tr>
+                        <th class="p-2.5">Name</th>
+                        <th class="p-2.5">Email</th>
+                        <th class="p-2.5">Status</th>
+                        <th class="p-2.5">Registered On</th>
+                      </tr>
+                    </thead>
+                    <tbody id="admin-attendees-tbody" class="divide-y divide-gray-100">
+                      <!-- Rendered dynamically -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Feedback Panel -->
+              <div id="admin-panel-feedback" role="tabpanel" aria-labelledby="admin-tab-feedback" class="hidden">
+                <div id="admin-feedback-loading" class="space-y-2 py-4">
+                  <div class="skeleton h-12 w-full"></div>
+                  <div class="skeleton h-12 w-full"></div>
+                </div>
+                <div id="admin-feedback-empty" class="text-center py-6 text-gray-500 text-xs hidden">
+                  No feedback records received for this event yet.
+                </div>
+                <div id="admin-feedback-list-wrap" class="space-y-3 hidden">
+                  <div class="flex items-center gap-3 p-3 bg-soft-mint/30 rounded-md mb-2">
+                    <span class="text-xs font-semibold text-deep-teal">Average Rating:</span>
+                    <span id="admin-avg-rating" class="text-sm font-bold text-deep-teal">--</span>
+                    <div id="admin-avg-stars" class="flex text-warm-amber text-xs"></div>
+                  </div>
+                  <div id="admin-feedback-cards" class="space-y-3">
+                    <!-- Rendered dynamically -->
+                  </div>
+                </div>
+              </div>
             </section>
 
           </div>
@@ -231,28 +426,102 @@
                 </div>
               </div>
 
-              <!-- Registration Box (Stage 4 Notice) -->
-              <div class="pt-4 border-t border-gray-100">
-                <div class="bg-gray-50 rounded-lg p-4 border border-gray-200 text-center">
-                  <span class="inline-flex items-center gap-1 badge-teal text-xs mb-2">
-                    <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
-                    </svg>
-                    Registration Notice
-                  </span>
+              <!-- ============================================================
+                   Interactive Registration Box (Stage 4)
+                   Supports: Guest Prompt, Unregistered, Registered, Cancelled,
+                   Cancellation Dialog, and Re-registration Limitations.
+                   ============================================================ -->
+              <div class="pt-4 border-t border-gray-100" id="registration-section">
+                
+                <!-- Registration Alert Box (Success, Error, 409 Notice) -->
+                <div id="registration-alert" class="mb-3 p-3 rounded-md text-xs hidden" role="alert"></div>
+
+                <!-- 1. Guest View -->
+                <div id="reg-view-guest" class="bg-gray-50 rounded-lg p-4 border border-gray-200 text-center hidden">
                   <p class="text-xs text-gray-600 mb-3">
-                    Event registration and attendee reservations will be enabled in <strong>Stage 4</strong>.
+                    Sign in with your community account to register attendance.
                   </p>
-                  <button type="button"
-                          class="btn-primary w-full justify-center opacity-60 cursor-not-allowed text-xs py-2.5"
-                          disabled
-                          title="Registration opens in Stage 4">
-                    Register for Event (Stage 4)
+                  <a id="reg-guest-login-btn" href="/pages/auth/login.html" class="btn-primary w-full justify-center text-xs py-2.5">
+                    Log in to Register
+                  </a>
+                </div>
+
+                <!-- 2. Unregistered View (Can Register) -->
+                <div id="reg-view-available" class="space-y-3 hidden">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs text-gray-500">Attendance:</span>
+                    <span class="badge bg-green-50 text-green-700 text-xs font-medium">Open for Registration</span>
+                  </div>
+                  <button type="button" id="register-event-btn" class="btn-primary w-full justify-center text-xs py-2.5 shadow-sm">
+                    Register for Event
                   </button>
-                  <p class="text-[11px] text-gray-400 mt-2">
-                    No action required today. Check back when Stage 4 is active.
+                  <p class="text-[11px] text-gray-400 text-center">
+                    Reserve your attendance for this civic event.
                   </p>
                 </div>
+
+                <!-- 3. Registered View (Confirmed Attendee) -->
+                <div id="reg-view-registered" class="bg-green-50/70 border border-green-200 rounded-lg p-4 space-y-3 hidden">
+                  <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-full bg-green-600 text-white flex items-center justify-center flex-shrink-0">
+                      <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <span class="badge-success text-xs font-semibold">Registration Confirmed</span>
+                      <p id="reg-confirmed-date" class="text-[11px] text-green-800 mt-0.5">Your spot is reserved.</p>
+                    </div>
+                  </div>
+
+                  <!-- Cancel Button (Triggers confirmation dialog) -->
+                  <div id="reg-cancel-trigger-wrap">
+                    <button type="button" id="start-cancel-reg-btn"
+                            class="inline-flex items-center justify-center w-full py-2 px-3 rounded-md border border-red-300 text-red-700 text-xs font-medium hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors cursor-pointer">
+                      Cancel Registration
+                    </button>
+                  </div>
+
+                  <!-- Cancellation Confirmation Prompt (Inline Dialog) -->
+                  <div id="reg-cancel-confirm-box" class="bg-white border border-red-200 rounded-md p-3 space-y-2.5 hidden" role="region" aria-label="Cancel registration confirmation">
+                    <p class="text-xs font-semibold text-red-800">
+                      Are you sure you want to cancel your attendance?
+                    </p>
+                    <p class="text-[11px] text-gray-600">
+                      Note: Once cancelled, the database constraint prevents re-enrolling for this event.
+                    </p>
+                    <div class="flex items-center gap-2">
+                      <button type="button" id="confirm-cancel-reg-btn" class="btn-destructive text-xs py-1.5 px-3 flex-1 justify-center">
+                        Yes, Cancel
+                      </button>
+                      <button type="button" id="abort-cancel-reg-btn" class="btn-secondary text-xs py-1.5 px-3 flex-1 justify-center">
+                        Keep Spot
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 4. Cancelled View -->
+                <div id="reg-view-cancelled" class="bg-amber-50 border border-amber-200 rounded-lg p-4 space-y-2 hidden">
+                  <div class="flex items-center gap-2">
+                    <span class="badge-warning text-xs font-semibold">Registration Cancelled</span>
+                  </div>
+                  <p class="text-xs text-amber-900 leading-relaxed">
+                    You have cancelled your attendance for this event.
+                  </p>
+                  <p class="text-[11px] text-amber-800 bg-white/70 p-2 rounded border border-amber-200">
+                    <strong>Backend notice:</strong> The database constraint retains cancelled status. Re-registration is not supported.
+                  </p>
+                </div>
+
+                <!-- 5. Event Concluded View (Past event) -->
+                <div id="reg-view-past" class="bg-gray-50 rounded-lg p-4 border border-gray-200 text-center hidden">
+                  <span class="badge bg-gray-200 text-gray-700 text-xs font-medium mb-1 inline-block">Event Concluded</span>
+                  <p class="text-xs text-gray-500">
+                    This event has already taken place. Registration is closed.
+                  </p>
+                </div>
+
               </div>
 
             </div>
@@ -283,4 +552,3 @@
 
 </body>
 </html>
-
