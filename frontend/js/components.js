@@ -56,6 +56,7 @@ function headerHTML(activePage = '') {
     const displayName = escapeHtml(user?.full_name?.split(' ')[0] ?? 'Account');
     const adminLink = admin
       ? `<a href="/pages/admin/dashboard.html" class="block px-4 py-2 text-sm text-teal font-medium hover:bg-soft-mint" role="menuitem">Admin Dashboard</a>
+         <a href="/pages/admin/users.html" class="block px-4 py-2 text-sm text-teal font-medium hover:bg-soft-mint" role="menuitem">Manage Users</a>
          <a href="/pages/admin/feedback.html" class="block px-4 py-2 text-sm text-teal font-medium hover:bg-soft-mint" role="menuitem">Event Feedback</a>
          <a href="/pages/admin/announcements.html" class="block px-4 py-2 text-sm text-teal font-medium hover:bg-soft-mint" role="menuitem">Manage Announcements</a>
          <a href="/pages/admin/promotions.html" class="block px-4 py-2 text-sm text-teal font-medium hover:bg-soft-mint" role="menuitem">Manage Promotions</a>
@@ -220,6 +221,8 @@ function headerHTML(activePage = '') {
         </a>
         ${admin ? `<a href="/pages/admin/dashboard.html"
                       class="block px-3 py-2.5 rounded-md text-sm font-medium text-teal font-semibold hover:bg-soft-mint">Admin Dashboard</a>
+                   <a href="/pages/admin/users.html"
+                      class="block px-3 py-2.5 rounded-md text-sm font-medium text-teal font-semibold hover:bg-soft-mint">Manage Users</a>
                    <a href="/pages/admin/feedback.html"
                       class="block px-3 py-2.5 rounded-md text-sm font-medium text-teal font-semibold hover:bg-soft-mint">Event Feedback</a>
                    <a href="/pages/admin/announcements.html"
