@@ -12,7 +12,7 @@
 import { requireAuth } from '../guards.js';
 import { initShell } from '../components.js';
 import api from '../api.js';
-import { formatDateTime, formatDate, escapeHtml, showToast, getCategoryInfo } from '../utils.js';
+import { formatDateTime, formatDate, escapeHtml, showToast, getCategoryInfo, openModal, closeModal as closeSharedModal, setupModalA11y } from '../utils.js';
 
 let allRegistrations = [];
 let activeTab = 'all'; // 'all' | 'registered' | 'cancelled'
@@ -39,15 +39,10 @@ function bindEvents() {
   $('#registrations-retry-btn').on('click', loadRegistrations);
 
   // Modal handlers
+  const cancelModalEl = document.getElementById('cancel-modal');
   $('#modal-abort-btn').on('click', closeModal);
   $('#modal-confirm-btn').on('click', executeCancellation);
-
-  // Close modal on Escape
-  $(document).on('keydown', (e) => {
-    if (e.key === 'Escape' && !$('#cancel-modal').hasClass('hidden')) {
-      closeModal();
-    }
-  });
+  setupModalA11y(cancelModalEl, closeModal, true);
 
   // Cross-tab synchronization
   window.addEventListener('auth-state-changed', () => {
@@ -231,7 +226,7 @@ function renderRegistrationsList() {
   $('.cancel-btn').on('click', function () {
     const eventId = $(this).data('event-id');
     const eventTitle = $(this).data('event-title');
-    openCancelModal(eventId, eventTitle);
+    openCancelModal(eventId, eventTitle, this);
   });
 }
 
@@ -239,13 +234,14 @@ function renderRegistrationsList() {
  * Opens the cancellation confirmation modal.
  * @param {string} eventId
  * @param {string} eventTitle
+ * @param {HTMLElement} [triggerEl]
  */
-function openCancelModal(eventId, eventTitle) {
+function openCancelModal(eventId, eventTitle, triggerEl = null) {
   pendingCancelEventId = eventId;
   pendingCancelEventTitle = eventTitle;
   $('#modal-event-name').text(eventTitle);
-  $('#cancel-modal').removeClass('hidden');
   $('#modal-confirm-btn').prop('disabled', false).text('Yes, Cancel Registration');
+  openModal(document.getElementById('cancel-modal'), triggerEl, '#modal-abort-btn');
 }
 
 /**
@@ -254,7 +250,7 @@ function openCancelModal(eventId, eventTitle) {
 function closeModal() {
   pendingCancelEventId = null;
   pendingCancelEventTitle = '';
-  $('#cancel-modal').addClass('hidden');
+  closeSharedModal(document.getElementById('cancel-modal'));
 }
 
 /**

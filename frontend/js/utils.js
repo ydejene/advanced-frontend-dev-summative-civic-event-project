@@ -150,3 +150,143 @@ export function getCategoryInfo(event) {
     fallbackImage: fallback,
   };
 }
+
+/* ==========================================================================
+   Shared Accessible Modal Management Utilities
+   ========================================================================== */
+
+let openModalCount = 0;
+const modalTriggerMap = new WeakMap();
+
+/**
+ * Accessible modal opener:
+ * - Increments open modal counter and locks body scroll.
+ * - Stores triggering element for focus restoration upon dismissal.
+ * - Displays the modal overlay element.
+ * - Focuses the specified element or the first interactive element.
+ *
+ * @param {HTMLElement} modalEl - The modal overlay element.
+ * @param {HTMLElement} [triggerEl] - Element that triggered the dialog.
+ * @param {string} [initialFocusSelector] - Optional CSS selector for initial focus.
+ */
+export function openModal(modalEl, triggerEl = null, initialFocusSelector = null) {
+  if (!modalEl) return;
+  const isAlreadyOpen = !modalEl.classList.contains('hidden');
+
+  const trigger = triggerEl || document.activeElement;
+  if (trigger && typeof trigger.focus === 'function' && !isAlreadyOpen) {
+    modalTriggerMap.set(modalEl, trigger);
+  }
+
+  if (!isAlreadyOpen) {
+    openModalCount++;
+    document.body.classList.add('overflow-hidden');
+    modalEl.classList.remove('hidden');
+    modalEl.setAttribute('aria-hidden', 'false');
+  }
+
+  let target = null;
+  if (initialFocusSelector) {
+    target = modalEl.querySelector(initialFocusSelector);
+  }
+  if (!target) {
+    target = modalEl.querySelector(
+      'a[href], button:not([disabled]), input:not([type="hidden"]):not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    );
+  }
+  target?.focus();
+}
+
+/**
+ * Accessible modal closer:
+ * - Hides the modal element and synchronizes ARIA visibility.
+ * - Decrements open modal counter; unlocks body scroll only when 0 modals remain open.
+ * - Restores keyboard focus to the triggering element.
+ *
+ * @param {HTMLElement} modalEl - The modal overlay element.
+ */
+export function closeModal(modalEl) {
+  if (!modalEl || modalEl.classList.contains('hidden')) return;
+  modalEl.classList.add('hidden');
+  modalEl.setAttribute('aria-hidden', 'true');
+
+  openModalCount = Math.max(0, openModalCount - 1);
+  if (openModalCount === 0) {
+    document.body.classList.remove('overflow-hidden');
+  }
+
+  const trigger = modalTriggerMap.get(modalEl);
+  if (trigger && typeof trigger.focus === 'function') {
+    trigger.focus();
+  }
+  modalTriggerMap.delete(modalEl);
+}
+
+/**
+ * Traps Tab and Shift+Tab keyboard focus inside an open modal dialog.
+ * @param {HTMLElement} modalEl
+ * @param {KeyboardEvent} e
+ */
+export function trapFocus(modalEl, e) {
+  if (e.key !== 'Tab' || !modalEl || modalEl.classList.contains('hidden')) return;
+
+  const focusables = Array.from(
+    modalEl.querySelectorAll(
+      'a[href], button:not([disabled]), input:not([type="hidden"]):not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    )
+  ).filter((el) => el.offsetParent !== null); // Visible elements only
+
+  if (!focusables.length) {
+    e.preventDefault();
+    return;
+  }
+
+  const first = focusables[0];
+  const last = focusables[focusables.length - 1];
+
+  if (e.shiftKey) {
+    if (document.activeElement === first || !modalEl.contains(document.activeElement)) {
+      e.preventDefault();
+      last.focus();
+    }
+  } else {
+    if (document.activeElement === last || !modalEl.contains(document.activeElement)) {
+      e.preventDefault();
+      first.focus();
+    }
+  }
+}
+
+/**
+ * Binds backdrop click and global keydown (Escape and Tab focus trapping) to a modal.
+ * Guards against duplicate registration on the same modal instance.
+ * @param {HTMLElement} modalEl - The modal element.
+ * @param {Function} onClose - Function to call on Escape or backdrop click.
+ * @param {boolean} [allowBackdrop=true] - Whether clicking the backdrop dismisses the dialog.
+ */
+export function setupModalA11y(modalEl, onClose, allowBackdrop = true) {
+  if (!modalEl || modalEl.dataset.a11yBound === 'true') return;
+  modalEl.dataset.a11yBound = 'true';
+
+  if (allowBackdrop) {
+    modalEl.addEventListener('click', (e) => {
+      if (e.target === modalEl) {
+        onClose();
+      }
+    });
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (modalEl.classList.contains('hidden')) return;
+
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      onClose();
+      return;
+    }
+
+    if (e.key === 'Tab') {
+      trapFocus(modalEl, e);
+    }
+  });
+}

@@ -16,6 +16,7 @@ let debounceTimer = null;
 $(function () {
   initShell('events');
   bindFilterEvents();
+  ingestUrlParams();
   loadEvents();
 });
 
@@ -100,6 +101,15 @@ function ingestUrlParams() {
     if (['all', 'upcoming', 'today', 'this_week', 'past'].includes(dateLower)) {
       $('#date-filter').val(dateLower);
     }
+  }
+
+  // Handle auto-focus from header search trigger
+  if (params.get('focus') === 'search') {
+    setTimeout(() => {
+      const $input = $('#event-search-input');
+      $input.focus().select();
+      $input[0]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 150);
   }
 }
 

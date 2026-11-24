@@ -10,7 +10,7 @@ import {
   deleteNotification,
   resolveNotificationLink
 } from '../../notifications.js';
-import { formatDateTime, escapeHtml, showToast, truncate } from '../../utils.js';
+import { formatDateTime, escapeHtml, showToast, truncate, openModal, closeModal, setupModalA11y } from '../../utils.js';
 
 // Enforce admin authorization
 if (!requireAdmin()) {
@@ -131,10 +131,10 @@ function renderTable(items) {
  */
 function bindTableActionEvents() {
   document.querySelectorAll('.btn-delete-notif').forEach((btn) => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', (e) => {
       const id = btn.getAttribute('data-id');
       const title = btn.getAttribute('data-title');
-      openDeleteModal(id, title);
+      openDeleteModal(id, title, e.currentTarget);
     });
   });
 }
@@ -143,8 +143,9 @@ function bindTableActionEvents() {
  * Opens delete confirmation modal.
  * @param {string} id
  * @param {string} title
+ * @param {HTMLElement} [triggerEl]
  */
-function openDeleteModal(id, title) {
+function openDeleteModal(id, title, triggerEl = null) {
   pendingDeleteId = id;
   const modal = document.getElementById('delete-modal');
   const desc = document.getElementById('delete-modal-desc');
@@ -153,7 +154,7 @@ function openDeleteModal(id, title) {
     desc.textContent = `Are you sure you want to permanently delete the notification "${title}"? If this is a broadcast bulletin, it will be deleted for all users.`;
   }
 
-  modal?.classList.remove('hidden');
+  openModal(modal, triggerEl, '#cancel-delete-btn');
 }
 
 /**
@@ -165,12 +166,13 @@ function bindModalEvents() {
   const confirmBtn = document.getElementById('confirm-delete-btn');
   const alertClose = document.getElementById('admin-alert-close');
 
-  const closeModal = () => {
-    modal?.classList.add('hidden');
+  const closeDeleteModal = () => {
+    closeModal(modal);
     pendingDeleteId = null;
   };
 
-  cancelBtn?.addEventListener('click', closeModal);
+  cancelBtn?.addEventListener('click', closeDeleteModal);
+  setupModalA11y(modal, closeDeleteModal, true);
 
   confirmBtn?.addEventListener('click', () => {
     if (!pendingDeleteId) return;
@@ -180,7 +182,7 @@ function bindModalEvents() {
 
     deleteNotification(pendingDeleteId)
       .done(() => {
-        closeModal();
+        closeDeleteModal();
         showToast('Notification deleted successfully', 'success');
         loadNotifications();
       })

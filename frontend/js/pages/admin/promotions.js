@@ -6,7 +6,7 @@
 import { initShell } from '../../components.js';
 import { requireAdmin } from '../../guards.js';
 import api from '../../api.js';
-import { formatDate, escapeHtml, showToast, truncate } from '../../utils.js';
+import { formatDate, escapeHtml, showToast, truncate, openModal, closeModal, setupModalA11y } from '../../utils.js';
 
 // Enforce role-based access before rendering
 if (!requireAdmin()) {
@@ -155,18 +155,18 @@ function bindTableActionEvents() {
 
   // Edit promo
   document.querySelectorAll('.btn-edit-promo').forEach((btn) => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', (e) => {
       const id = btn.getAttribute('data-id');
-      openEditModal(id);
+      openEditModal(id, e.currentTarget);
     });
   });
 
   // Delete promo
   document.querySelectorAll('.btn-delete-promo').forEach((btn) => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', (e) => {
       const id = btn.getAttribute('data-id');
       const title = btn.getAttribute('data-title');
-      openDeleteModal(id, title);
+      openDeleteModal(id, title, e.currentTarget);
     });
   });
 }
@@ -194,8 +194,9 @@ function togglePublishStatus(id, currentPublished) {
 /**
  * Opens edit modal populated with existing record data.
  * @param {string} id
+ * @param {HTMLElement} [triggerEl]
  */
-function openEditModal(id) {
+function openEditModal(id, triggerEl = null) {
   const item = promos.find((p) => String(p.id) === String(id));
   if (!item) return;
 
@@ -219,15 +220,16 @@ function openEditModal(id) {
     errorEl.classList.add('hidden');
   }
 
-  modal?.classList.remove('hidden');
+  openModal(modal, triggerEl, '#edit-title');
 }
 
 /**
  * Opens delete confirmation modal.
  * @param {string} id
  * @param {string} title
+ * @param {HTMLElement} [triggerEl]
  */
-function openDeleteModal(id, title) {
+function openDeleteModal(id, title, triggerEl = null) {
   pendingDeleteId = id;
   const modal = document.getElementById('delete-modal');
   const desc = document.getElementById('delete-modal-desc');
@@ -236,7 +238,7 @@ function openDeleteModal(id, title) {
     desc.textContent = `Are you sure you want to permanently delete the promotion "${title}"? This action cannot be reversed.`;
   }
 
-  modal?.classList.remove('hidden');
+  openModal(modal, triggerEl, '#cancel-delete-btn');
 }
 
 /**
@@ -259,16 +261,16 @@ function bindModalEvents() {
 
   const alertClose = document.getElementById('admin-alert-close');
 
-  const openCreate = () => {
+  const openCreate = (e) => {
     document.getElementById('create-promo-form')?.reset();
     document.getElementById('create-error')?.classList.add('hidden');
-    createModal?.classList.remove('hidden');
+    openModal(createModal, e?.currentTarget, '#create-title');
   };
 
-  const closeCreate = () => createModal?.classList.add('hidden');
-  const closeEdit = () => editModal?.classList.add('hidden');
+  const closeCreate = () => closeModal(createModal);
+  const closeEdit = () => closeModal(editModal);
   const closeDelete = () => {
-    deleteModal?.classList.add('hidden');
+    closeModal(deleteModal);
     pendingDeleteId = null;
   };
 
@@ -282,6 +284,10 @@ function bindModalEvents() {
   cancelEditBtn?.addEventListener('click', closeEdit);
 
   cancelDeleteBtn?.addEventListener('click', closeDelete);
+
+  setupModalA11y(createModal, closeCreate, true);
+  setupModalA11y(editModal, closeEdit, true);
+  setupModalA11y(deleteModal, closeDelete, true);
 
   confirmDeleteBtn?.addEventListener('click', () => {
     if (!pendingDeleteId) return;
@@ -391,7 +397,7 @@ function handleCreateSubmit() {
 
   api.upload('/promos', formData)
     .done(() => {
-      document.getElementById('create-modal')?.classList.add('hidden');
+      closeModal(document.getElementById('create-modal'));
       showToast('Promotion created successfully', 'success');
       loadPromos();
     })
@@ -457,7 +463,7 @@ function handleEditSubmit() {
 
   api.put(`/promos/${id}`, formData)
     .done(() => {
-      document.getElementById('edit-modal')?.classList.add('hidden');
+      closeModal(document.getElementById('edit-modal'));
       showToast('Promotion updated successfully', 'success');
       loadPromos();
     })
