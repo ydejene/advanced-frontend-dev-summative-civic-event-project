@@ -1,10 +1,12 @@
-# CivicEvents — Accessible City Events & Services Portal
+# CivicEvents — Frontend Application Documentation
+
+> **Note:** This document provides technical reference for the frontend web application. For the complete system overview, overall repository structure, backend database setup, and video demonstration details, see the [Root Project README](../README.md).
 
 ## 1. Project Overview
 
 CivicEvents is an accessible, responsive municipal web portal designed to connect community residents with city activities, civic workshops, official announcements, promotional campaigns, and municipal service inquiries.
 
-The frontend is a static multi-page application that interfaces with a Node.js/Express REST API backed by a PostgreSQL database.
+The frontend is a static multi-page application built with semantic HTML5, Tailwind CSS, and jQuery that interfaces with a Node.js/Express REST API backed by a PostgreSQL database.
 
 ---
 
@@ -24,6 +26,7 @@ The frontend is a static multi-page application that interfaces with a Node.js/E
   - Local service requests submission and status tracking for neighborhood maintenance issues.
 - **Administrative Operations:**
   - Operations dashboard presenting verified municipal metrics and KPI growth trends.
+  - Event management console for authoring, editing, publishing, and deleting community events with image upload.
   - User account management table with role filtering, status toggling, pagination, and active session protection.
   - Global event feedback moderation console.
   - Media management consoles for publishing audio announcements and video promotional campaigns.
@@ -51,7 +54,7 @@ frontend/
 ├── index.html                      # Portal homepage
 ├── package.json                    # Build scripts and local dev dependencies
 ├── tailwind.config.js              # Theme colors, fonts, and content paths
-├── README.md                       # Project documentation
+├── README.md                       # Frontend documentation
 ├── assets/
 │   ├── icons/                      # SVG and PNG brand assets
 │   ├── images/                     # Curated photography for events and hero sections
@@ -84,6 +87,7 @@ frontend/
 │       ├── service-requests.js     # User service request creation & tracking
 │       └── admin/                  # Administrative management consoles
 │           ├── dashboard.js        # Operations dashboard & backend KPI statistics
+│           ├── events.js           # Event CRUD, publishing toggles & image upload
 │           ├── users.js            # User directory, role filters & status management
 │           ├── feedback.js         # Global event feedback moderation console
 │           ├── announcements.js    # Announcement authoring, upload & status toggle
@@ -97,7 +101,7 @@ frontend/
     ├── promotions/                 # index.html, detail.html
     ├── notifications/              # index.html
     ├── user/                       # profile.html, registrations.html, service-requests.html
-    └── admin/                      # dashboard, users, feedback, announcements,
+    └── admin/                      # dashboard, events, users, feedback, announcements,
                                     # promotions, notifications, service-requests
 ```
 

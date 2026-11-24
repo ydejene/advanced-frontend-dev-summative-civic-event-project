@@ -1,5 +1,5 @@
 /**
- * CivicEvents — Public Event Detail Controller (Stage 4)
+ * CivicEvents — Public Event Detail Controller
  *
  * Handles:
  *  - Event details presentation and category image fallbacks
@@ -280,7 +280,7 @@ function renderEventDetail(event) {
 }
 
 /* ==========================================================================
-   Stage 4: Registration Functionality
+   Registration Functionality
    ========================================================================== */
 
 /**
@@ -422,7 +422,7 @@ async function handleCancelRegistration() {
 }
 
 /* ==========================================================================
-   Stage 4: Feedback Functionality
+   Feedback Functionality
    ========================================================================== */
 
 /**
@@ -627,7 +627,7 @@ async function handleFeedbackSubmit(e) {
 }
 
 /* ==========================================================================
-   Stage 4: Administrator Overview (Attendees & Feedback)
+   Administrator Overview (Attendees & Feedback)
    ========================================================================== */
 
 /**

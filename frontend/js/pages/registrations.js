@@ -1,5 +1,5 @@
 /**
- * CivicEvents — My Registrations Controller (Stage 4)
+ * CivicEvents — My Registrations Controller
  *
  * Handles:
  *  - Route guard protection (authenticated users only)
