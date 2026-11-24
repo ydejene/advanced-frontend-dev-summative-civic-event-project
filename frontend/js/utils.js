@@ -4,7 +4,7 @@
  * Auth session helpers are sourced from ./auth.js and re-exported here
  * to maintain backward compatibility across existing imports.
  */
-export { getToken, getUser, isAuthenticated, isAdmin } from './auth.js';
+export { getToken, getUser, isAuthenticated, isAdmin, updateUserSession } from './auth.js';
 
 /**
  * Formats an ISO date string to a locale-friendly display value.

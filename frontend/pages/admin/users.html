@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Municipal portal user management console for reviewing community resident accounts and managing access standing.">
+  <title>Manage Users — CivicEvents Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/output.css">
+  <link rel="icon" type="image/svg+xml" href="/assets/icons/civicevents-mark.svg">
+</head>
+<body class="font-body bg-off-white flex flex-col min-h-screen text-gray-800">
+
+  <!-- Skip link for keyboard accessibility -->
+  <a href="#main-content"
+     class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-teal focus:text-white focus:rounded-md focus:shadow-md">
+    Skip to main content
+  </a>
+
+  <!-- Application shell: header injected by components.js -->
+  <div id="site-header"></div>
+
+  <!-- Breadcrumb navigation -->
+  <div class="bg-white border-b border-gray-200">
+    <div class="container-content py-3">
+      <nav aria-label="Breadcrumb">
+        <ol class="flex items-center space-x-2 text-xs text-gray-500">
+          <li>
+            <a href="/index.html" class="hover:text-teal">Home</a>
+          </li>
+          <li class="flex items-center space-x-2">
+            <span class="text-gray-400">/</span>
+            <span class="text-gray-500">Admin</span>
+          </li>
+          <li class="flex items-center space-x-2">
+            <span class="text-gray-400">/</span>
+            <span class="text-gray-800 font-medium" aria-current="page">Manage Users</span>
+          </li>
+        </ol>
+      </nav>
+    </div>
+  </div>
+
+  <main class="flex-1 py-8 sm:py-12" id="main-content">
+    <div class="container-content">
+
+      <!-- Page Header -->
+      <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+        <div>
+          <div class="flex items-center gap-2 mb-2">
+            <span class="badge-teal text-xs font-semibold px-2.5 py-1">Administrator Access</span>
+            <span class="badge bg-amber-100 text-amber-800 text-xs font-medium">Restricted Area</span>
+          </div>
+          <h1 class="text-2xl sm:text-3xl font-heading font-extrabold text-deep-teal tracking-tight">
+            User Account Management
+          </h1>
+          <p class="text-sm sm:text-base text-gray-600 mt-1 max-w-2xl leading-relaxed">
+            Inspect registered community accounts, verify platform roles, and manage active standing.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <a href="/pages/admin/dashboard.html" class="btn-secondary text-xs sm:text-sm py-2 px-3.5 inline-flex items-center gap-1.5">
+            <svg class="w-4 h-4 text-teal" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+            </svg>
+            Admin Dashboard
+          </a>
+        </div>
+      </header>
+
+      <!-- Alert Message Box -->
+      <div id="users-alert" class="card p-4 mb-6 hidden" role="alert">
+        <div class="flex items-start gap-3">
+          <div id="users-alert-icon" class="flex-shrink-0 mt-0.5"></div>
+          <div class="flex-1 text-sm font-medium" id="users-alert-message"></div>
+          <button type="button" id="users-alert-close" class="text-gray-400 hover:text-gray-600 cursor-pointer" aria-label="Dismiss alert">&times;</button>
+        </div>
+      </div>
+
+      <!-- Search & Filter Controls -->
+      <section class="card p-4 sm:p-5 mb-8" aria-label="User search and filters">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <!-- Keyword Search -->
+          <div class="relative lg:col-span-2">
+            <label for="user-search" class="sr-only">Search users by name or email</label>
+            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+              <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/>
+              </svg>
+            </div>
+            <input type="search"
+                   id="user-search"
+                   placeholder="Search by full name or email address…"
+                   class="form-input pl-10 pr-9 py-2 text-sm"
+                   autocomplete="off">
+            <button type="button"
+                    id="search-clear-btn"
+                    class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 hidden cursor-pointer"
+                    aria-label="Clear search">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Status Filter -->
+          <div>
+            <label for="filter-status" class="sr-only">Filter by account status</label>
+            <select id="filter-status" class="form-input py-2 text-xs">
+              <option value="all">All Statuses</option>
+              <option value="active">Active Accounts</option>
+              <option value="disabled">Disabled Accounts</option>
+            </select>
+          </div>
+
+          <!-- Role Filter -->
+          <div>
+            <label for="filter-role" class="sr-only">Filter by role</label>
+            <select id="filter-role" class="form-input py-2 text-xs">
+              <option value="all">All Roles</option>
+              <option value="admin">Administrators</option>
+              <option value="user">Community Members</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <!-- Loading State Skeleton -->
+      <div id="users-loading" class="card p-8 animate-pulse space-y-4" aria-live="polite" aria-busy="true">
+        <div class="h-6 bg-gray-200 rounded w-1/4"></div>
+        <div class="h-10 bg-gray-100 rounded"></div>
+        <div class="h-10 bg-gray-100 rounded"></div>
+        <div class="h-10 bg-gray-100 rounded"></div>
+      </div>
+
+      <!-- Empty State -->
+      <div id="users-empty" class="card p-10 text-center max-w-md mx-auto hidden">
+        <div class="w-14 h-14 mx-auto rounded-full bg-soft-mint text-deep-teal flex items-center justify-center mb-4">
+          <svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+          </svg>
+        </div>
+        <h2 class="font-heading text-lg font-bold text-deep-teal mb-1" id="empty-title">No Users Found</h2>
+        <p class="text-sm text-gray-500 mb-4" id="empty-desc">No accounts match your selected search or filter criteria.</p>
+        <button type="button" id="empty-reset-btn" class="btn-secondary text-xs hidden">Reset Filters</button>
+      </div>
+
+      <!-- Users Management Table -->
+      <div id="table-container" class="card overflow-hidden shadow-sm hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-sm">
+            <thead>
+              <tr class="bg-gray-50 border-b border-gray-200 text-xs font-semibold uppercase text-gray-600 tracking-wider">
+                <th scope="col" class="py-3.5 px-4 sm:px-6">User Profile</th>
+                <th scope="col" class="py-3.5 px-4 sm:px-6">Role</th>
+                <th scope="col" class="py-3.5 px-4 sm:px-6">Status</th>
+                <th scope="col" class="py-3.5 px-4 sm:px-6">Registered</th>
+                <th scope="col" class="py-3.5 px-4 sm:px-6 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="users-tbody" class="divide-y divide-gray-200 bg-white">
+              <!-- Rendered dynamically by admin/users.js -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination Controls Bar -->
+        <div id="users-pagination" class="px-4 py-3 sm:px-6 bg-gray-50 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p class="text-xs text-gray-600" id="pagination-summary">
+            Showing <span id="pagination-range-start" class="font-semibold text-gray-800">0</span> to <span id="pagination-range-end" class="font-semibold text-gray-800">0</span> of <span id="pagination-total-count" class="font-semibold text-gray-800">0</span> users
+          </p>
+          <div class="flex items-center gap-1.5" id="pagination-controls">
+            <button type="button" id="prev-page-btn" class="px-3 py-1.5 text-xs font-medium border border-gray-300 rounded bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed">
+              &larr; Previous
+            </button>
+            <div id="pagination-pages" class="flex items-center gap-1"></div>
+            <button type="button" id="next-page-btn" class="px-3 py-1.5 text-xs font-medium border border-gray-300 rounded bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed">
+              Next &rarr;
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Status Change Confirmation Modal -->
+  <div id="status-modal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 hidden" role="dialog" aria-modal="true" aria-labelledby="status-modal-title">
+    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full overflow-hidden animate-fadeIn p-6">
+      <div id="status-modal-icon-container" class="w-12 h-12 mx-auto rounded-full flex items-center justify-center mb-4">
+        <!-- Injected icon -->
+      </div>
+      <h3 id="status-modal-title" class="font-heading font-bold text-lg text-gray-900 text-center mb-2">
+        Confirm Status Change
+      </h3>
+      <p class="text-sm text-gray-600 text-center mb-6" id="status-modal-desc">
+        Are you sure you want to change this user's account status?
+      </p>
+      <div class="flex items-center justify-center gap-3">
+        <button type="button" id="cancel-status-btn" class="btn-secondary text-sm">Cancel</button>
+        <button type="button" id="confirm-status-btn" class="px-5 py-2 text-sm font-semibold text-white rounded-md cursor-pointer transition">
+          Confirm
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Application shell: footer injected by components.js -->
+  <div id="site-footer"></div>
+
+  <!-- Local jQuery -->
+  <script src="/node_modules/jquery/dist/jquery.min.js"></script>
+
+  <!-- Page script module -->
+  <script type="module" src="/js/pages/admin/users.js"></script>
+
+</body>
+</html>
+

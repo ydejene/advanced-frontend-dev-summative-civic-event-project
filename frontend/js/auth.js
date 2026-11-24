@@ -90,6 +90,14 @@ export function setSession(token, user) {
 }
 
 /**
+ * Updates stored user profile without altering the active session token.
+ * @param {Object} user - Updated user profile
+ */
+export function updateUserSession(user) {
+  setSession(getToken(), user);
+}
+
+/**
  * Removes session credentials from localStorage and clears any legacy session items.
  */
 export function clearSession() {
