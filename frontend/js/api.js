@@ -72,6 +72,9 @@ const api = {
   /** POST with FormData (file uploads). */
   upload: (endpoint, formData) => request({ method: 'POST', endpoint, data: formData }),
 
+  /** PUT with FormData (file uploads / updates). */
+  uploadPut: (endpoint, formData) => request({ method: 'PUT', endpoint, data: formData }),
+
   /** Public requests that do not attach a token. */
   public: {
     get:  (endpoint)       => request({ method: 'GET',  endpoint, auth: false }),
