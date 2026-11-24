@@ -52,9 +52,21 @@ export function isAuthenticated() {
 }
 
 /**
- * Role-based check: Returns true if the stored session user has role 'admin'.
- * Used for client-side navigation and route guard gating.
- * @returns {boolean}
+ * Role-Based Access Helper:
+ * Evaluates whether the active session user holds administrative privileges ('admin').
+ *
+ * Role Distinction:
+ * - 'user'  : Ordinary community resident. Permitted to browse public feeds, register
+ *             for events, submit feedback, manage their own profile, and track service requests.
+ * - 'admin' : Municipal administrator. Granted access to administrative dashboards, event CRUD,
+ *             user account directory management, announcement/promotion publishing, and feedback moderation.
+ *
+ * Security Architecture:
+ * - This function powers client-side UI adaptation (showing/hiding admin links, route gating).
+ * - True security is enforced server-side: protected API endpoints independently verify
+ *   the user's role claim within the JWT payload via Express authorization middleware.
+ *
+ * @returns {boolean} True if the active user object has role === 'admin'.
  */
 export function isAdmin() {
   const user = getUser();

@@ -1,5 +1,5 @@
 /**
- * CivicEvents — Admin Feedback & Attendees Controller (Stage 4)
+ * CivicEvents — Admin Feedback & Attendees Controller
  *
  * Handles:
  *  - Route guard enforcement (requires role === 'admin')

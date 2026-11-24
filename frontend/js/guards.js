@@ -1,32 +1,50 @@
 /**
- * Frontend route and access guard module.
+ * Frontend Route & Role-Based Access Guard Module
  *
- * Responsibilities:
- *   - Prevent unauthenticated users from viewing protected user or admin pages.
- *   - Role-based guard: Restrict administrative views to accounts with role 'admin'.
- *   - Prevent authenticated users from accessing visitor-only pages (e.g. login, signup).
- *   - Prevent flash of unauthorized content before route checks complete.
- *   - Cross-tab synchronization: Automatically update/redirect pages when session
- *     state changes in another open browser tab.
+ * Architecture & Access Control Overview:
+ * 1. Authentication Checking:
+ *    - Validates presence of active JWT session credentials via isAuthenticated() in auth.js.
+ *    - If unauthenticated, access is blocked and the visitor is redirected to /pages/auth/login.html
+ *      with the return path encoded in the URL query string.
  *
- * IMPORTANT SECURITY NOTE:
- * Frontend guards are a usability and workflow measure to guide visitors.
- * They do NOT replace backend authorization. The backend API enforces true
- * security via authentication and authorization middleware on all protected routes.
+ * 2. Role-Based Access Enforcement:
+ *    - Differentiates between ordinary community residents (role: 'user') and municipal staff (role: 'admin').
+ *    - requireAdmin() enforces both an active session AND role === 'admin'.
+ *    - Ordinary authenticated users attempting to access administrator consoles (/pages/admin/*)
+ *      are prevented from viewing the interface and redirected to /index.html?error=forbidden.
+ *
+ * 3. Visitor / Guest Gating:
+ *    - requireGuest() prevents logged-in users from accessing login and registration entry pages,
+ *      routing administrators to /pages/admin/dashboard.html and residents to /index.html.
+ *
+ * 4. Content Concealment:
+ *    - concealPageContent() hides DOM elements during evaluation to prevent flash of unauthorized
+ *      content (FOUC) prior to redirect execution.
+ *
+ * 5. Defense-in-Depth & Backend Authorization Authority:
+ *    - IMPORTANT SECURITY NOTE: Frontend guards govern client-side UI visibility and navigation flow.
+ *    - They DO NOT replace backend security. The Node.js/Express API remains the sole authority,
+ *      authenticating every request via JWT verification (authenticate middleware) and enforcing
+ *      privilege checks via role middleware (authorize(['admin'])). Any direct API request by an
+ *      ordinary user to an administrative endpoint returns HTTP 403 Forbidden regardless of frontend state.
  */
 import { isAuthenticated, isAdmin, clearSession } from './auth.js';
 
 /**
  * Route Guard: Requires an active authenticated session.
- * Optionally restricts the view to administrators.
+ * Used across member-only resident pages (/pages/user/*, /pages/notifications/*).
+ *
+ * When options.adminOnly is true, enforces administrative privileges (role === 'admin').
+ * If an ordinary authenticated user (role: 'user') attempts access, they are redirected
+ * to /index.html?error=forbidden.
  *
  * Usage in page scripts:
  *   import { requireAuth } from '../guards.js';
  *   if (!requireAuth()) return;
  *
  * @param {Object} [options]
- * @param {boolean} [options.adminOnly=false] - When true, enforces role === 'admin'
- * @param {string}  [options.redirectUrl]     - Custom redirect destination for unauthenticated visitors
+ * @param {boolean} [options.adminOnly=false] - When true, restricts access strictly to role === 'admin'
+ * @param {string}  [options.redirectUrl]     - Optional override destination for unauthenticated visitors
  * @returns {boolean} True if the visitor satisfies the access requirements, false otherwise.
  */
 export function requireAuth(options = {}) {
@@ -61,9 +79,15 @@ export function requireAuth(options = {}) {
 }
 
 /**
- * Convenience wrapper for admin-only pages.
- * Enforces authenticated session AND role === 'admin'.
- * @returns {boolean}
+ * Role-Based Route Guard: Admin-Only Console Protection.
+ * Restricts administrative management views (/pages/admin/*) strictly to accounts with role === 'admin'.
+ *
+ * Protection mechanism:
+ * - Unauthenticated visitors -> redirected to login page with return redirect.
+ * - Authenticated normal users -> redirected to home page with ?error=forbidden indicator.
+ * - Authenticated administrators -> page content is revealed and script execution proceeds.
+ *
+ * @returns {boolean} True if user is authenticated with admin privileges.
  */
 export function requireAdmin() {
   return requireAuth({ adminOnly: true });
