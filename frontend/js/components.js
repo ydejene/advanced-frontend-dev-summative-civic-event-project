@@ -56,6 +56,7 @@ function headerHTML(activePage = '') {
     const displayName = escapeHtml(user?.full_name?.split(' ')[0] ?? 'Account');
     const adminLink = admin
       ? `<a href="/pages/admin/dashboard.html" class="block px-4 py-2 text-sm text-teal font-medium hover:bg-soft-mint" role="menuitem">Admin Dashboard</a>
+         <a href="/pages/admin/events.html" class="block px-4 py-2 text-sm text-teal font-medium hover:bg-soft-mint" role="menuitem">Manage Events</a>
          <a href="/pages/admin/users.html" class="block px-4 py-2 text-sm text-teal font-medium hover:bg-soft-mint" role="menuitem">Manage Users</a>
          <a href="/pages/admin/feedback.html" class="block px-4 py-2 text-sm text-teal font-medium hover:bg-soft-mint" role="menuitem">Event Feedback</a>
          <a href="/pages/admin/announcements.html" class="block px-4 py-2 text-sm text-teal font-medium hover:bg-soft-mint" role="menuitem">Manage Announcements</a>
@@ -171,8 +172,8 @@ function headerHTML(activePage = '') {
       <div class="hidden md:flex items-center gap-3">
         <!-- Search -->
         <button type="button"
-                class="p-1 text-gray-500 hover:text-teal focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal"
-                aria-label="Search" id="search-toggle">
+                class="p-1 text-gray-500 hover:text-teal focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal cursor-pointer"
+                aria-label="Search events" id="search-toggle">
           <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                stroke-width="1.5" stroke="currentColor" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round"
@@ -209,6 +210,14 @@ function headerHTML(activePage = '') {
            data-nav-id="${item.id}"
            class="block px-3 py-2.5 rounded-md text-sm font-medium ${currentShellPage === item.id ? 'text-teal bg-soft-mint' : 'text-gray-700 hover:bg-soft-mint hover:text-teal'}"
            ${currentShellPage === item.id ? 'aria-current="page"' : ''}>${item.label}</a>`).join('')}
+      <a href="/pages/events/index.html?focus=search"
+         id="mobile-search-btn"
+         class="flex items-center gap-2 px-3 py-2.5 rounded-md text-sm font-medium text-gray-700 hover:bg-soft-mint hover:text-teal cursor-pointer">
+        <svg class="w-4 h-4 text-teal" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/>
+        </svg>
+        <span>Search Events</span>
+      </a>
       <hr class="my-2 border-gray-100">
       ${authenticated ? `
         <a href="/pages/user/profile.html"
@@ -224,6 +233,8 @@ function headerHTML(activePage = '') {
         </a>
         ${admin ? `<a href="/pages/admin/dashboard.html"
                       class="block px-3 py-2.5 rounded-md text-sm font-medium text-teal font-semibold hover:bg-soft-mint">Admin Dashboard</a>
+                   <a href="/pages/admin/events.html"
+                      class="block px-3 py-2.5 rounded-md text-sm font-medium text-teal font-semibold hover:bg-soft-mint">Manage Events</a>
                    <a href="/pages/admin/users.html"
                       class="block px-3 py-2.5 rounded-md text-sm font-medium text-teal font-semibold hover:bg-soft-mint">Manage Users</a>
                    <a href="/pages/admin/feedback.html"
@@ -522,6 +533,48 @@ function attachHeaderHandlers() {
 
   // Update notification badge on initialization
   updateNotificationBadge();
+
+  /* Header search navigation (desktop and mobile) */
+  const triggerEventSearchFocus = (e) => {
+    const isEventsPage =
+      window.location.pathname.includes('/pages/events/index.html') ||
+      window.location.pathname.endsWith('/events/') ||
+      window.location.pathname.endsWith('/events');
+
+    if (isEventsPage) {
+      if (e) e.preventDefault();
+      const mobileMenu = document.getElementById('mobile-menu');
+      if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+        mobileMenu.classList.add('hidden');
+        document.getElementById('mobile-menu-btn')?.setAttribute('aria-expanded', 'false');
+      }
+      const searchInput = document.getElementById('event-search-input');
+      if (searchInput) {
+        searchInput.focus();
+        searchInput.select();
+        searchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    } else {
+      window.location.href = '/pages/events/index.html?focus=search';
+    }
+  };
+
+  document.getElementById('search-toggle')?.addEventListener('click', triggerEventSearchFocus);
+  document.getElementById('mobile-search-btn')?.addEventListener('click', (e) => {
+    const mobileMenu = document.getElementById('mobile-menu');
+    if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+      mobileMenu.classList.add('hidden');
+      document.getElementById('mobile-menu-btn')?.setAttribute('aria-expanded', 'false');
+    }
+    const isEventsPage =
+      window.location.pathname.includes('/pages/events/index.html') ||
+      window.location.pathname.endsWith('/events/') ||
+      window.location.pathname.endsWith('/events');
+
+    if (isEventsPage) {
+      triggerEventSearchFocus(e);
+    }
+  });
 
   /* Logout handlers (desktop and mobile) — clears session and redirects */
   ['logout-btn', 'mobile-logout-btn'].forEach(id => {

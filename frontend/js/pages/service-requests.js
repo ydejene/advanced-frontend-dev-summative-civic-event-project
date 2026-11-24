@@ -6,7 +6,7 @@
 import { initShell } from '../components.js';
 import { requireAuth } from '../guards.js';
 import { getUser } from '../auth.js';
-import { formatDate, escapeHtml, showToast } from '../utils.js';
+import { formatDate, escapeHtml, showToast, openModal, closeModal, setupModalA11y } from '../utils.js';
 import {
   SERVICE_TYPES,
   getUserRequests,
@@ -227,10 +227,10 @@ function renderRequests() {
  */
 function bindCardActionEvents() {
   document.querySelectorAll('.btn-view-details').forEach((btn) => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', (e) => {
       const id = btn.getAttribute('data-id');
       const req = userRequests.find(r => r.id === id);
-      if (req) openDetailsModal(req);
+      if (req) openDetailsModal(req, e.currentTarget);
     });
   });
 }
@@ -410,29 +410,18 @@ function bindModalEvents() {
   const closeBtn = document.getElementById('modal-close-btn');
   const dismissBtn = document.getElementById('modal-dismiss-btn');
 
-  const closeModal = () => {
-    modal?.classList.add('hidden');
-  };
+  closeBtn?.addEventListener('click', () => closeModal(modal));
+  dismissBtn?.addEventListener('click', () => closeModal(modal));
 
-  closeBtn?.addEventListener('click', closeModal);
-  dismissBtn?.addEventListener('click', closeModal);
-
-  modal?.addEventListener('click', (e) => {
-    if (e.target === modal) closeModal();
-  });
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !modal?.classList.contains('hidden')) {
-      closeModal();
-    }
-  });
+  setupModalA11y(modal, () => closeModal(modal), true);
 }
 
 /**
  * Populates and reveals the details modal for a single request.
  * @param {Object} req
+ * @param {HTMLElement} [triggerEl]
  */
-function openDetailsModal(req) {
+function openDetailsModal(req, triggerEl = null) {
   const modal = document.getElementById('details-modal');
   const modalCategory = document.getElementById('modal-category');
   const modalTitle = document.getElementById('modal-title');
@@ -478,7 +467,7 @@ function openDetailsModal(req) {
     }
   }
 
-  modal?.classList.remove('hidden');
+  openModal(modal, triggerEl, '#modal-close-btn');
 }
 
 /**

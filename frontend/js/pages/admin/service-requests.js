@@ -5,7 +5,7 @@
  */
 import { initShell } from '../../components.js';
 import { requireAdmin } from '../../guards.js';
-import { formatDate, escapeHtml, showToast } from '../../utils.js';
+import { formatDate, escapeHtml, showToast, openModal, closeModal, setupModalA11y } from '../../utils.js';
 import {
   SERVICE_TYPES,
   getAllRequests,
@@ -273,10 +273,10 @@ function bindPaginationEvents() {
  */
 function bindTableActionEvents() {
   document.querySelectorAll('.btn-review-req').forEach((btn) => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', (e) => {
       const id = btn.getAttribute('data-id');
       const req = allRequests.find(r => r.id === id);
-      if (req) openReviewModal(req);
+      if (req) openReviewModal(req, e.currentTarget);
     });
   });
 }
@@ -339,23 +339,15 @@ function bindModalEvents() {
   const form = document.getElementById('status-update-form');
   const alertClose = document.getElementById('admin-alert-close');
 
-  const closeModal = () => {
-    modal?.classList.add('hidden');
+  const closeReviewModal = () => {
+    closeModal(modal);
     currentEditingId = null;
   };
 
-  closeBtn?.addEventListener('click', closeModal);
-  cancelBtn?.addEventListener('click', closeModal);
+  closeBtn?.addEventListener('click', closeReviewModal);
+  cancelBtn?.addEventListener('click', closeReviewModal);
 
-  modal?.addEventListener('click', (e) => {
-    if (e.target === modal) closeModal();
-  });
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !modal?.classList.contains('hidden')) {
-      closeModal();
-    }
-  });
+  setupModalA11y(modal, closeReviewModal, true);
 
   form?.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -388,7 +380,7 @@ function bindModalEvents() {
     showToast(`Request ${currentEditingId} status updated to ${newStatus}`, 'success');
     showAlert(`Request ${currentEditingId} marked as ${newStatus} in local storage.`, 'success');
 
-    closeModal();
+    closeReviewModal();
     loadRequests();
   });
 
@@ -400,8 +392,9 @@ function bindModalEvents() {
 /**
  * Opens review and status update modal for a specific request.
  * @param {Object} req
+ * @param {HTMLElement} [triggerEl]
  */
-function openReviewModal(req) {
+function openReviewModal(req, triggerEl = null) {
   currentEditingId = req.id;
 
   const modal = document.getElementById('review-modal');
@@ -440,7 +433,7 @@ function openReviewModal(req) {
   if (statusSelect) statusSelect.value = req.status;
   if (notesInput) notesInput.value = req.status_notes || '';
 
-  modal?.classList.remove('hidden');
+  openModal(modal, triggerEl, '#modal-status-select');
 }
 
 /**

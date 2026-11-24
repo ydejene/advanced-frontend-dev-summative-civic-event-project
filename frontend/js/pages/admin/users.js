@@ -7,7 +7,7 @@ import { initShell } from '../../components.js';
 import { requireAdmin } from '../../guards.js';
 import api from '../../api.js';
 import { getUser } from '../../auth.js';
-import { formatDate, escapeHtml, showToast } from '../../utils.js';
+import { formatDate, escapeHtml, showToast, openModal, closeModal, setupModalA11y } from '../../utils.js';
 
 // Enforce admin authorization
 if (!requireAdmin()) {
@@ -300,11 +300,11 @@ function bindPaginationEvents() {
  */
 function bindTableActionEvents() {
   document.querySelectorAll('.btn-toggle-status').forEach((btn) => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', (e) => {
       const id = btn.getAttribute('data-id');
       const name = btn.getAttribute('data-name');
       const action = btn.getAttribute('data-action');
-      openStatusModal(id, name, action);
+      openStatusModal(id, name, action, e.currentTarget);
     });
   });
 }
@@ -317,7 +317,7 @@ function bindTableActionEvents() {
  * @param {string} name
  * @param {'enable'|'disable'} action
  */
-function openStatusModal(id, name, action) {
+function openStatusModal(id, name, action, triggerEl = null) {
   pendingAction = { id, name, targetStatus: action };
 
   const modal = document.getElementById('status-modal');
@@ -356,7 +356,7 @@ function openStatusModal(id, name, action) {
     }
   }
 
-  modal?.classList.remove('hidden');
+  openModal(modal, triggerEl, '#cancel-status-btn');
 }
 
 /**
@@ -368,12 +368,13 @@ function bindModalEvents() {
   const confirmBtn = document.getElementById('confirm-status-btn');
   const alertClose = document.getElementById('users-alert-close');
 
-  const closeModal = () => {
-    modal?.classList.add('hidden');
+  const closeStatusModal = () => {
+    closeModal(modal);
     pendingAction = null;
   };
 
-  cancelBtn?.addEventListener('click', closeModal);
+  cancelBtn?.addEventListener('click', closeStatusModal);
+  setupModalA11y(modal, closeStatusModal, true);
 
   confirmBtn?.addEventListener('click', () => {
     if (!pendingAction) return;
@@ -386,7 +387,7 @@ function bindModalEvents() {
 
     api.patch(endpoint, {})
       .done(() => {
-        closeModal();
+        closeStatusModal();
         const actionVerb = targetStatus === 'enable' ? 'enabled' : 'disabled';
         showToast(`Account for ${name} has been ${actionVerb}`, 'success');
         showAlert(`Account for ${name} was ${actionVerb} successfully.`, 'success');
