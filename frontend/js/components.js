@@ -60,7 +60,8 @@ function headerHTML(activePage = '') {
          <a href="/pages/admin/feedback.html" class="block px-4 py-2 text-sm text-teal font-medium hover:bg-soft-mint" role="menuitem">Event Feedback</a>
          <a href="/pages/admin/announcements.html" class="block px-4 py-2 text-sm text-teal font-medium hover:bg-soft-mint" role="menuitem">Manage Announcements</a>
          <a href="/pages/admin/promotions.html" class="block px-4 py-2 text-sm text-teal font-medium hover:bg-soft-mint" role="menuitem">Manage Promotions</a>
-         <a href="/pages/admin/notifications.html" class="block px-4 py-2 text-sm text-teal font-medium hover:bg-soft-mint" role="menuitem">Manage Notifications</a>`
+         <a href="/pages/admin/notifications.html" class="block px-4 py-2 text-sm text-teal font-medium hover:bg-soft-mint" role="menuitem">Manage Notifications</a>
+         <a href="/pages/admin/service-requests.html" class="block px-4 py-2 text-sm text-teal font-medium hover:bg-soft-mint" role="menuitem">Manage Service Requests</a>`
       : '';
     authControls = `
       <div class="relative" id="profile-menu">
@@ -214,6 +215,8 @@ function headerHTML(activePage = '') {
            class="block px-3 py-2.5 rounded-md text-sm font-medium text-gray-700 hover:bg-soft-mint">My Profile</a>
         <a href="/pages/user/registrations.html"
            class="block px-3 py-2.5 rounded-md text-sm font-medium text-gray-700 hover:bg-soft-mint">My Registrations</a>
+        <a href="/pages/user/service-requests.html"
+           class="block px-3 py-2.5 rounded-md text-sm font-medium text-gray-700 hover:bg-soft-mint">My Service Requests</a>
         <a href="/pages/notifications/index.html"
            class="flex items-center justify-between px-3 py-2.5 rounded-md text-sm font-medium text-gray-700 hover:bg-soft-mint">
           <span>Notifications</span>
@@ -230,7 +233,9 @@ function headerHTML(activePage = '') {
                    <a href="/pages/admin/promotions.html"
                       class="block px-3 py-2.5 rounded-md text-sm font-medium text-teal font-semibold hover:bg-soft-mint">Manage Promotions</a>
                    <a href="/pages/admin/notifications.html"
-                      class="block px-3 py-2.5 rounded-md text-sm font-medium text-teal font-semibold hover:bg-soft-mint">Manage Notifications</a>` : ''}
+                      class="block px-3 py-2.5 rounded-md text-sm font-medium text-teal font-semibold hover:bg-soft-mint">Manage Notifications</a>
+                   <a href="/pages/admin/service-requests.html"
+                      class="block px-3 py-2.5 rounded-md text-sm font-medium text-teal font-semibold hover:bg-soft-mint">Manage Service Requests</a>` : ''}
         <button type="button" id="mobile-logout-btn"
                 class="block w-full text-left px-3 py-2.5 rounded-md text-sm font-medium text-red-600 hover:bg-red-50 cursor-pointer">Logout</button>
       ` : `

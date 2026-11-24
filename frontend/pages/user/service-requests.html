@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Report local neighborhood issues, submit civic service requests, and track inquiry status in the CivicEvents portal.">
+  <title>My Service Requests — CivicEvents</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/output.css">
+  <link rel="icon" type="image/svg+xml" href="/assets/icons/civicevents-mark.svg">
+</head>
+<body class="font-body bg-off-white flex flex-col min-h-screen text-gray-800">
+
+  <!-- Skip link for keyboard accessibility -->
+  <a href="#main-content"
+     class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-teal focus:text-white focus:rounded-md focus:shadow-md">
+    Skip to main content
+  </a>
+
+  <!-- Application shell: header injected by components.js -->
+  <div id="site-header"></div>
+
+  <!-- Breadcrumb navigation -->
+  <div class="bg-white border-b border-gray-200">
+    <div class="container-content py-3">
+      <nav aria-label="Breadcrumb">
+        <ol class="flex items-center space-x-2 text-xs text-gray-500">
+          <li>
+            <a href="/index.html" class="hover:text-teal">Home</a>
+          </li>
+          <li class="flex items-center space-x-2">
+            <span class="text-gray-400">/</span>
+            <span class="text-gray-500">My Account</span>
+          </li>
+          <li class="flex items-center space-x-2">
+            <span class="text-gray-400">/</span>
+            <span class="text-gray-800 font-medium" aria-current="page">My Service Requests</span>
+          </li>
+        </ol>
+      </nav>
+    </div>
+  </div>
+
+  <main class="flex-1 py-8 sm:py-12" id="main-content">
+    <div class="container-content">
+
+      <!-- Technical Limitation & Demonstration Notice -->
+      <aside class="mb-6 p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs sm:text-sm flex items-start gap-3 shadow-xs" role="note" aria-label="Demonstration Notice">
+        <svg class="w-5 h-5 text-amber-700 flex-shrink-0 mt-0.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <div class="leading-relaxed">
+          <strong class="font-semibold text-amber-950">Local Demonstration Feature:</strong>
+          Service requests are stored locally in your browser's <code class="font-mono bg-amber-100/70 px-1 py-0.5 rounded text-amber-950">localStorage</code> for demonstration purposes and are not submitted to a remote server.
+          Browser storage does not constitute a secure sandbox; stored data can be inspected or modified by anyone with access to this browser profile.
+          Clearing this site's local storage or site data removes locally stored requests. Data is not shared across different browser profiles or devices.
+        </div>
+      </aside>
+
+      <!-- Page Header -->
+      <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+        <div>
+          <span class="badge-teal text-xs font-semibold px-2.5 py-1 mb-2 inline-block">Resident Inquiries</span>
+          <h1 class="text-2xl sm:text-3xl font-heading font-extrabold text-deep-teal tracking-tight">
+            My Service Requests
+          </h1>
+          <p class="text-sm sm:text-base text-gray-600 mt-1 max-w-2xl leading-relaxed">
+            Report community maintenance issues, submit public service inquiries, and monitor progress updates.
+          </p>
+        </div>
+
+        <div>
+          <button type="button"
+                  id="toggle-new-request-btn"
+                  class="btn-primary text-xs sm:text-sm py-2.5 px-4 inline-flex items-center gap-2 cursor-pointer shadow-xs">
+            <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            <span>Submit New Request</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Alert Message Box -->
+      <div id="request-alert" class="card p-4 mb-6 hidden" role="alert">
+        <div class="flex items-start gap-3">
+          <div id="request-alert-icon" class="flex-shrink-0 mt-0.5"></div>
+          <div class="flex-1 text-sm font-medium" id="request-alert-message"></div>
+          <button type="button" id="request-alert-close" class="text-gray-400 hover:text-gray-600 cursor-pointer" aria-label="Dismiss alert">&times;</button>
+        </div>
+      </div>
+
+      <!-- Collapsible Request Submission Form Card -->
+      <section id="form-section" class="card p-6 sm:p-8 mb-8 border border-teal/20 shadow-sm hidden" aria-labelledby="form-heading">
+        <div class="flex items-center justify-between pb-4 mb-6 border-b border-gray-100">
+          <div>
+            <h2 id="form-heading" class="text-lg font-heading font-bold text-deep-teal">
+              Submit a Community Service Request
+            </h2>
+            <p class="text-xs text-gray-500 mt-0.5">Fill out the details below to log your inquiry locally in this browser.</p>
+          </div>
+          <button type="button" id="form-cancel-top-btn" class="text-gray-400 hover:text-gray-600 p-1 cursor-pointer" aria-label="Close form">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <form id="new-request-form" class="space-y-5" novalidate>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <!-- Service Category / Type -->
+            <div>
+              <label for="req-category" class="form-label">
+                Service Category <span class="text-red-500">*</span>
+              </label>
+              <select id="req-category" name="category" required class="form-input text-sm">
+                <option value="">Select a service category…</option>
+                <!-- Dynamically populated from SERVICE_TYPES -->
+              </select>
+              <p id="category-error" class="text-xs text-red-600 mt-1 hidden"></p>
+            </div>
+
+            <!-- Location / Address -->
+            <div>
+              <label for="req-location" class="form-label">
+                Location or Address <span class="text-gray-400 font-normal">(Optional)</span>
+              </label>
+              <input type="text"
+                     id="req-location"
+                     name="location"
+                     maxlength="200"
+                     class="form-input text-sm"
+                     placeholder="e.g. Corner of 5th Ave and Maple St">
+              <p class="text-[11px] text-gray-400 mt-1">Specify street intersection or nearby civic landmark.</p>
+            </div>
+          </div>
+
+          <!-- Subject / Title -->
+          <div>
+            <label for="req-title" class="form-label">
+              Request Subject / Summary <span class="text-red-500">*</span>
+            </label>
+            <input type="text"
+                   id="req-title"
+                   name="title"
+                   required
+                   minlength="3"
+                   maxlength="120"
+                   class="form-input text-sm"
+                   placeholder="e.g. Streetlight out on 4th block near civic library">
+            <p id="title-error" class="text-xs text-red-600 mt-1 hidden"></p>
+          </div>
+
+          <!-- Description -->
+          <div>
+            <label for="req-description" class="form-label">
+              Detailed Description <span class="text-red-500">*</span>
+            </label>
+            <textarea id="req-description"
+                      name="description"
+                      rows="4"
+                      required
+                      minlength="10"
+                      maxlength="2000"
+                      class="form-input text-sm"
+                      placeholder="Please provide specific details about the issue, any safety concerns, or observable conditions…"></textarea>
+            <div class="flex items-center justify-between text-[11px] text-gray-400 mt-1">
+              <span>Minimum 10 characters</span>
+              <span id="desc-char-count">0 / 2000</span>
+            </div>
+            <p id="desc-error" class="text-xs text-red-600 mt-1 hidden"></p>
+          </div>
+
+          <!-- Form Action Buttons -->
+          <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
+            <button type="button" id="form-cancel-btn" class="btn-secondary text-xs sm:text-sm py-2 px-4 cursor-pointer">
+              Cancel
+            </button>
+            <button type="submit" id="form-submit-btn" class="btn-primary text-xs sm:text-sm py-2 px-6 cursor-pointer">
+              Submit Request
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Filter Controls & Tab Bar -->
+      <section class="card p-4 sm:p-5 mb-6" aria-label="Filter and search service requests">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+
+          <!-- Status Tabs -->
+          <div class="flex items-center gap-1 overflow-x-auto pb-1 sm:pb-0" role="tablist" aria-label="Filter by status">
+            <button type="button"
+                    class="status-tab px-3 py-1.5 text-xs font-semibold rounded-md transition-colors cursor-pointer bg-teal text-white"
+                    data-status="all"
+                    role="tab"
+                    aria-selected="true">
+              All (<span id="count-all">0</span>)
+            </button>
+            <button type="button"
+                    class="status-tab px-3 py-1.5 text-xs font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors cursor-pointer"
+                    data-status="Submitted"
+                    role="tab"
+                    aria-selected="false">
+              Submitted (<span id="count-submitted">0</span>)
+            </button>
+            <button type="button"
+                    class="status-tab px-3 py-1.5 text-xs font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors cursor-pointer"
+                    data-status="In Review"
+                    role="tab"
+                    aria-selected="false">
+              In Review (<span id="count-in-review">0</span>)
+            </button>
+            <button type="button"
+                    class="status-tab px-3 py-1.5 text-xs font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors cursor-pointer"
+                    data-status="Resolved"
+                    role="tab"
+                    aria-selected="false">
+              Resolved (<span id="count-resolved">0</span>)
+            </button>
+            <button type="button"
+                    class="status-tab px-3 py-1.5 text-xs font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors cursor-pointer"
+                    data-status="Rejected"
+                    role="tab"
+                    aria-selected="false">
+              Rejected (<span id="count-rejected">0</span>)
+            </button>
+          </div>
+
+          <!-- Category filter & Search Input -->
+          <div class="flex flex-col sm:flex-row items-center gap-3">
+            <div class="w-full sm:w-48">
+              <label for="filter-category" class="sr-only">Filter by Category</label>
+              <select id="filter-category" class="form-input text-xs py-1.5">
+                <option value="all">All Categories</option>
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+
+            <div class="relative w-full sm:w-56">
+              <label for="filter-search" class="sr-only">Search requests</label>
+              <input type="search"
+                     id="filter-search"
+                     placeholder="Search requests…"
+                     class="form-input text-xs py-1.5 pl-8 pr-3">
+              <svg class="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-2.5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/>
+              </svg>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Requests List Container -->
+      <section id="requests-list" class="space-y-4" aria-label="Your submitted requests">
+        <!-- Rendered dynamically by service-requests.js -->
+      </section>
+
+      <!-- Empty State -->
+      <div id="requests-empty" class="card p-12 text-center max-w-md mx-auto hidden">
+        <div class="w-14 h-14 mx-auto rounded-full bg-soft-mint text-deep-teal flex items-center justify-center mb-4">
+          <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+        </div>
+        <h2 class="font-heading text-lg font-bold text-deep-teal mb-1" id="empty-title">No Service Requests Found</h2>
+        <p class="text-sm text-gray-500 mb-5" id="empty-desc">
+          You haven't submitted any service requests in this browser yet. Notice a problem in your neighborhood?
+        </p>
+        <button type="button" id="empty-create-btn" class="btn-primary text-xs px-4 py-2 cursor-pointer">
+          Create First Request
+        </button>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Request Details Modal -->
+  <div id="details-modal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="bg-white rounded-xl shadow-2xl max-w-xl w-full overflow-hidden animate-fadeIn p-6 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-start justify-between pb-4 border-b border-gray-100">
+        <div>
+          <span id="modal-category" class="badge-teal text-[11px] font-semibold px-2 py-0.5 rounded"></span>
+          <h3 id="modal-title" class="font-heading font-bold text-lg text-deep-teal mt-1"></h3>
+          <p class="text-xs text-gray-500 font-mono" id="modal-id"></p>
+        </div>
+        <button type="button" id="modal-close-btn" class="text-gray-400 hover:text-gray-600 p-1 cursor-pointer" aria-label="Close dialog">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="py-4 space-y-4 text-sm">
+        <div class="flex items-center justify-between text-xs bg-gray-50 p-3 rounded-lg border border-gray-200">
+          <div>
+            <span class="text-gray-500 block">Current Status</span>
+            <span id="modal-status" class="badge text-xs font-semibold px-2.5 py-0.5 rounded border mt-0.5 inline-block"></span>
+          </div>
+          <div class="text-right">
+            <span class="text-gray-500 block">Submitted On</span>
+            <span id="modal-date" class="font-medium text-gray-800"></span>
+          </div>
+        </div>
+
+        <div id="modal-location-container" class="hidden">
+          <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-1">Reported Location</span>
+          <p id="modal-location" class="text-gray-800 text-xs bg-gray-50 px-3 py-2 rounded border border-gray-200 font-medium flex items-center gap-1.5">
+            <svg class="w-4 h-4 text-teal flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            <span id="modal-location-text"></span>
+          </p>
+        </div>
+
+        <div>
+          <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-1">Issue Description</span>
+          <p id="modal-description" class="text-xs sm:text-sm text-gray-700 bg-gray-50/70 p-3.5 rounded-lg border border-gray-200 whitespace-pre-wrap leading-relaxed"></p>
+        </div>
+
+        <div id="modal-notes-container" class="hidden">
+          <span class="text-xs font-semibold text-deep-teal uppercase tracking-wider block mb-1">Official Administrative Update</span>
+          <div class="bg-teal/5 border border-teal/20 rounded-lg p-3 text-xs sm:text-sm text-deep-teal leading-relaxed">
+            <p id="modal-notes" class="whitespace-pre-wrap"></p>
+          </div>
+        </div>
+
+        <div class="text-[11px] text-gray-400 pt-2 border-t border-gray-100 flex items-center justify-between">
+          <span>Last updated: <span id="modal-updated"></span></span>
+          <span class="italic">Stored locally in this browser</span>
+        </div>
+      </div>
+
+      <div class="pt-3 border-t border-gray-100 flex justify-end">
+        <button type="button" id="modal-dismiss-btn" class="btn-secondary text-xs px-4 py-2 cursor-pointer">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Application shell: footer injected by components.js -->
+  <div id="site-footer"></div>
+
+  <!-- Local jQuery -->
+  <script src="/node_modules/jquery/dist/jquery.min.js"></script>
+
+  <!-- Page script module -->
+  <script type="module" src="/js/pages/service-requests.js"></script>
+
+</body>
+</html>
+
